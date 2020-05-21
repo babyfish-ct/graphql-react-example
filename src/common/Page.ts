@@ -69,7 +69,7 @@ export function usePageQuery<TEntity = any>({
         }
         return Math.floor((rowCount + pageSize - 1) / pageSize);
     }, [skip, pageSize, rowCount]);
-    const expectedPageNo = useMemo<number | undefined>(() => {
+    const actualPageNo = useMemo<number | undefined>(() => {
         if (pageCount === undefined) {
             return undefined;
         }
@@ -82,14 +82,14 @@ export function usePageQuery<TEntity = any>({
     const listGraphQLOptions = useMemo<QueryHookOptions<GraphQLRoot<TEntity[]>>>(() => {
         return {
             ...options,
-            skip: skip || expectedPageNo === undefined,
+            skip: skip || actualPageNo === undefined || pageCount === 0,
             variables: {
                 ...options?.variables,
                 [limitArgumentName]: pageSize,
-                [offsetArgumentName]: ((expectedPageNo ?? 1) - 1) * pageSize
+                [offsetArgumentName]: (actualPageNo! - 1) * pageSize
             }
         };
-    }, [skip, options, limitArgumentName, offsetArgumentName, pageSize, expectedPageNo]);
+    }, [skip, options, limitArgumentName, offsetArgumentName, pageSize, actualPageNo]);
     const listResult = useQuery<GraphQLRoot<TEntity[]>>(
         listGraphQLNode,
         listGraphQLOptions
@@ -107,7 +107,7 @@ export function usePageQuery<TEntity = any>({
         if (skip || 
             rowCount === undefined || 
             pageCount === undefined || 
-            expectedPageNo === undefined || 
+            actualPageNo === undefined || 
             list === undefined) {
             page = undefined;
         } else if (pageCount === 0) {
@@ -120,7 +120,7 @@ export function usePageQuery<TEntity = any>({
             };
         } else {
             page = {
-                pageNo: expectedPageNo,
+                pageNo: actualPageNo,
                 pageSize,
                 rowCount,
                 pageCount,
@@ -133,7 +133,7 @@ export function usePageQuery<TEntity = any>({
             loading: listResult.loading || countResult.loading,
             called: listResult.called
         };
-    }, [countResult, listResult, rowCount, pageCount, list, skip, expectedPageNo, pageSize]);
+    }, [countResult, listResult, rowCount, pageCount, list, skip, actualPageNo, pageSize]);
 }
 
 export const DEFAULT_LIST_PAGE_SIZE = 5;

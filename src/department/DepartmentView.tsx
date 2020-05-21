@@ -56,4 +56,4 @@ export const DepartmentView: React.FC<{
 };
 
 const LABEL_SPAN = 8;
-const VALUE_SPAN = 16;
+const VALUE_SPAN = 24 - LABEL_SPAN;

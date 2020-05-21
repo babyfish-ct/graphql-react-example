@@ -73,7 +73,7 @@ export const ManagementView: React.FC = () => {
 
     return (
         <Layout>
-            <Layout.Sider theme="light" width={500}>
+            <Layout.Sider theme="light" width={550}>
                 <div style={{padding: '1rem'}}>
                     <SpecificationView value={specification} onChange={setSpecification}/>
                 </div>

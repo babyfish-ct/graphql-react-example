@@ -9,7 +9,7 @@ export const AppView: React.FC = () => {
         <Layout>
                 <Layout.Header style={{backgroundColor: 'white'}}>
                     <div className="header">
-                        <div>GraphQL React Example</div>
+                        <div style={{width: 496}}>GraphQL React Example</div>
                         <MenuView/>
                     </div>
                 </Layout.Header>
