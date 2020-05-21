@@ -1,4 +1,4 @@
-import React, { useState, useCallback, ChangeEvent } from 'react';
+import React, { useCallback, ChangeEvent } from 'react';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import Checkbox, { CheckboxChangeEvent } from 'antd/es/checkbox';
@@ -14,18 +14,18 @@ import { DepartmentSortedType } from '../model/DepartmentSortedType';
 import { DepartmentSpecification } from '../model/DepartmentSpecification';
 import { Key } from 'antd/es/table/interface';
 
-export const CriteriaView: React.FC<{
+export const SpecificationView: React.FC<{
     value: DepartmentSpecification,
     onChange: (value: DepartmentSpecification) => void
 }> = ({value, onChange}) => {
 
-    const onNameChanged = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const onNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const trimedValue = e.target.value.trim();
         onChange({
             ...value,
             name: trimedValue === "" ? undefined : trimedValue
         });
-    }, [value, onchange]);
+    }, [value, onChange]);
 
     const onSortedTypeChange = useCallback((sortedType: DepartmentSortedType) => {
         onChange({
@@ -57,7 +57,7 @@ export const CriteriaView: React.FC<{
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}>
             <Form.Item label="Name">
-                <Input value={value.name} onChange={onNameChanged}/>
+                <Input value={value.name} onChange={onNameChange}/>
             </Form.Item>
             <Form.Item label="Sorted type">
                 <Select<DepartmentSortedType> 

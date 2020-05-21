@@ -19,7 +19,7 @@ export const DepartmentView: React.FC<{
                 <EmployeeView value={employee} depth={depth + 1}/>
             </List.Item>
         );
-    }, []);
+    }, [depth]);
 
     return (
         <div style={{flex: 1}}>

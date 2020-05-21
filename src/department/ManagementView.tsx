@@ -1,23 +1,22 @@
-import React, { useState, useCallback, ReactNode, useMemo } from 'react';
-import { CriteriaView } from './CriteriaView';
+import React, { useState, useCallback, ReactNode, useMemo, useEffect } from 'react';
+import { SpecificationView } from './SpecificationView';
 import { DepartmentSpecification, DEFAULT_DEPARTMENT_SPECIFICATION } from '../model/DepartmentSpecification';
-import { usePageQuery } from '../common/Page';
+import { usePageQuery, DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
 import { createDynamicGraphQLBody } from '../model/dynamic/GraphQLDynamicBody';
 import { Case } from '../common/Case';
 import List from 'antd/es/list';
 import { Department } from '../model/Department';
 import { DepartmentView } from './DepartmentView';
-import Row from 'antd/es/row';
-import Col from 'antd/es/col';
 import { PaginationConfig } from 'antd/es/pagination';
 import Spin from 'antd/es/spin';
+import Layout from 'antd/es/layout';
 
 export const ManagementView: React.FC = () => {
 
     const [specification, setSpecification] = useState<DepartmentSpecification>(DEFAULT_DEPARTMENT_SPECIFICATION);
     const [pageNo, setPageNo] = useState<number>(1);
 
-    const { called, loading, error, page } = usePageQuery({
+    const { loading, error, page } = usePageQuery<Department>({
         skip: specification.graphQLPaths.length === 0,
         countGraphQL: `query($name: String) { 
             departmentCount(name: $name)
@@ -38,7 +37,7 @@ export const ManagementView: React.FC = () => {
             }
         }`,
         pageNo,
-        pageSize: 10,
+        pageSize: DEFAULT_LIST_PAGE_SIZE,
         options: {
             fetchPolicy: 'no-cache',
             variables: {
@@ -48,6 +47,9 @@ export const ManagementView: React.FC = () => {
             }
         }
     });
+    useEffect(() => {
+        setPageNo(1);
+    }, [specification]);
 
     const renderDepartment = useCallback((department: Department, index: number): ReactNode => {
         return (
@@ -57,23 +59,26 @@ export const ManagementView: React.FC = () => {
         );
     }, []);
 
-    const pagination = useMemo<PaginationConfig>(() => {
+    const pagination = useMemo<PaginationConfig | undefined>(() => {
+        if (page === undefined) {
+            return undefined
+        }
         return {
-            current: page?.pageNo ?? 1,
-            pageSize: 10,
-            total: page?.pageCount ?? 0,
+            current: page.pageNo,
+            pageSize: page.pageSize,
+            total: page.rowCount,
             onChange: (page: number) => { setPageNo(page); }
         }
     }, [page]);
 
     return (
-        <Row>
-            <Col span={12}>
+        <Layout>
+            <Layout.Sider theme="light" width={500}>
                 <div style={{padding: '1rem'}}>
-                    <CriteriaView value={specification} onChange={setSpecification}/>
+                    <SpecificationView value={specification} onChange={setSpecification}/>
                 </div>
-            </Col>
-            <Col span={12}>
+            </Layout.Sider>
+            <Layout.Content>
                 <div style={{padding: '1rem'}}>
                     {
                         new Case()
@@ -99,8 +104,8 @@ export const ManagementView: React.FC = () => {
                         )
                     }
                 </div>
-            </Col>
-        </Row>
+            </Layout.Content>
+        </Layout>
     );
 };
 

@@ -45,7 +45,7 @@ export class GraphQLNodeBuilder {
     build(depth: number): string {
         let result = indentString(depth);
         result += this.name;
-        if (this.childList.length == 0) {
+        if (this.childList.length === 0) {
             result += '\n';
         } else if (depth !== 0) {
             result += ' {\n';

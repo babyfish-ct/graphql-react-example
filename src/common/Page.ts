@@ -135,3 +135,5 @@ export function usePageQuery<TEntity = any>({
         };
     }, [countResult, listResult, rowCount, pageCount, list, skip, expectedPageNo, pageSize]);
 }
+
+export const DEFAULT_LIST_PAGE_SIZE = 5;

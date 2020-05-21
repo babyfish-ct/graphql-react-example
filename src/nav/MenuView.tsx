@@ -1,4 +1,4 @@
-import React, { useMemo, useCallback } from 'react';
+import React, { useCallback } from 'react';
 import Menu, { ClickParam } from 'antd/es/menu';
 import { useLocation } from 'wouter';
 import { DEPARTMENTS, EMPLOYEES } from './Constants';

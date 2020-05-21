@@ -5,7 +5,6 @@ import Col from 'antd/es/col';
 import { Value, hasValue } from '../common/Value';
 import List from 'antd/es/list';
 import { DepartmentView } from '../department/DepartmentView';
-import { Case } from '../common/Case';
 import Card from 'antd/es/card';
 
 export const EmployeeView: React.FC<{
@@ -19,7 +18,7 @@ export const EmployeeView: React.FC<{
                 <EmployeeView value={employee} depth={depth + 1}/>
             </List.Item>
         );
-    }, []);
+    }, [depth]);
 
     return (
         <div style={{flex:1}}>
