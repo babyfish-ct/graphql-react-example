@@ -6,7 +6,7 @@ export function unwrapRoot<T>(root: GraphQLRoot<T> | undefined) {
     }
     const keys = Object.keys(root);
     if (keys.length !== 1) {
-        throw new Error("The argument must an object with only one property is it's not undefined");
+        throw new Error("The argument must an object with only one property if it's not undefined");
     }
     return root[keys[0]];
 }

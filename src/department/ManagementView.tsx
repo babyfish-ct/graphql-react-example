@@ -12,13 +12,14 @@ import Spin from 'antd/es/spin';
 import Layout from 'antd/es/layout';
 import Button from 'antd/es/button';
 import { PlusCircleOutlined } from '@ant-design/icons';
-import { Editor } from './Editor';
+import { EditDialog } from './EditDialog';
 
 export const ManagementView: React.FC = () => {
 
     const [specification, setSpecification] = useState<DepartmentSpecification>(DEFAULT_DEPARTMENT_SPECIFICATION);
     const [pageNo, setPageNo] = useState<number>(1);
-    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
+    const [creatingDialogVisible, setCreatingDialogVisible] = useState<boolean>(false);
+    const [modifiedId, setModifiedId] = useState<number>();
 
     const { loading, error, page, refetch } = usePageQuery<Department>({
         skip: specification.graphQLPaths.length === 0,
@@ -58,7 +59,10 @@ export const ManagementView: React.FC = () => {
     const renderDepartment = useCallback((department: Department, index: number): ReactNode => {
         return (
             <List.Item key={index}>
-                <DepartmentView value={department}/>
+                <DepartmentView 
+                value={department} 
+                onEditing={setModifiedId}
+                onDeleted={refetch}/>
             </List.Item>
         );
     }, [refetch]);
@@ -75,16 +79,26 @@ export const ManagementView: React.FC = () => {
         }
     }, [page]);
 
-    const onOpenDialog = useCallback(() => {
-        setDialogVisible(true);
+    const openOpenCreatingDialog = useCallback(() => {
+        setCreatingDialogVisible(true);
     }, []);
 
-    const onCloseDialog = useCallback((saved: boolean) => {
+    const onCloseCreatingDialog = useCallback((saved: boolean) => {
         if (saved) {
             refetch();
-            console.log('refetch');
         }
-        setDialogVisible(false);
+        setCreatingDialogVisible(false);
+    }, [refetch]);
+
+    const openOpenModifyingDialog = useCallback((modifiedId: number) => {
+        setModifiedId(modifiedId);
+    }, []);
+
+    const onCloseModifyingDialog = useCallback((saved: boolean) => {
+        if (saved) {
+            refetch();
+        }
+        setModifiedId(undefined);
     }, [refetch]);
 
     return (
@@ -96,11 +110,17 @@ export const ManagementView: React.FC = () => {
             </Layout.Sider>
             <Layout.Content>
                 <div style={{padding: '1rem'}}>
-                    <Button onClick={onOpenDialog}>
+                    <Button onClick={openOpenCreatingDialog}>
                         <PlusCircleOutlined />
                         Create department...
                     </Button>
-                    <Editor visible={dialogVisible} onClose={onCloseDialog}/>
+                    <EditDialog 
+                    visible={creatingDialogVisible} 
+                    onClose={onCloseCreatingDialog}/>
+                    <EditDialog 
+                    id={modifiedId}
+                    visible={modifiedId !== undefined} 
+                    onClose={onCloseModifyingDialog}/>
                     {
                         new Case()
                         .when(

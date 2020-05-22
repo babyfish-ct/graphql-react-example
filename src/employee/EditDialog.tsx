@@ -1,9 +1,9 @@
 import React from 'react';
 
-export const Editor: React.FC = () => {
+export const EditDialog: React.FC = () => {
     return (
         <div>
-            Employee Editor
+            TODO
         </div>
     );
 };
