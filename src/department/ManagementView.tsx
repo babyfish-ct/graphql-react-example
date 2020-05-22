@@ -10,11 +10,15 @@ import { DepartmentView } from './DepartmentView';
 import { PaginationConfig } from 'antd/es/pagination';
 import Spin from 'antd/es/spin';
 import Layout from 'antd/es/layout';
+import Button from 'antd/es/button';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Editor } from './Editor';
 
 export const ManagementView: React.FC = () => {
 
     const [specification, setSpecification] = useState<DepartmentSpecification>(DEFAULT_DEPARTMENT_SPECIFICATION);
     const [pageNo, setPageNo] = useState<number>(1);
+    const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
     const { loading, error, page } = usePageQuery<Department>({
         skip: specification.graphQLPaths.length === 0,
@@ -71,6 +75,14 @@ export const ManagementView: React.FC = () => {
         }
     }, [page]);
 
+    const onOpenDialog = useCallback(() => {
+        setDialogVisible(true);
+    }, []);
+
+    const onCloseDialog = useCallback((saved: boolean) => {
+        setDialogVisible(false);
+    }, []);
+
     return (
         <Layout>
             <Layout.Sider theme="light" width={550}>
@@ -80,6 +92,11 @@ export const ManagementView: React.FC = () => {
             </Layout.Sider>
             <Layout.Content>
                 <div style={{padding: '1rem'}}>
+                    <Button onClick={onOpenDialog}>
+                        <PlusCircleOutlined />
+                        Create department...
+                    </Button>
+                    <Editor visible={dialogVisible} onClose={onCloseDialog}/>
                     {
                         new Case()
                         .when(

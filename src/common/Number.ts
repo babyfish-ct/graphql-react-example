@@ -1,6 +1,6 @@
-export function numberOf(value: number | string | undefined): number | undefined {
-    if (value === undefined) {
-        return value;
+export function numberOf(value: number | string | null | undefined): number | undefined {
+    if (value === undefined || value === null) {
+        return undefined;
     }
     let num: number;
     if (typeof(value) === 'number') {

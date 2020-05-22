@@ -89,7 +89,7 @@ export function usePageQuery<TEntity = any>({
                 [offsetArgumentName]: (actualPageNo! - 1) * pageSize
             }
         };
-    }, [skip, options, limitArgumentName, offsetArgumentName, pageSize, actualPageNo]);
+    }, [skip, options, limitArgumentName, offsetArgumentName, pageSize, pageCount, actualPageNo]);
     const listResult = useQuery<GraphQLRoot<TEntity[]>>(
         listGraphQLNode,
         listGraphQLOptions
