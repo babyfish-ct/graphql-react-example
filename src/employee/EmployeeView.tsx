@@ -8,14 +8,14 @@ import { DepartmentView } from '../department/DepartmentView';
 import Card from 'antd/es/card';
 
 export const EmployeeView: React.FC<{
-    value: Employee,
+    employee: Employee,
     depth?: number
-}> = ({value, depth = 1}) => {
+}> = ({employee, depth = 1}) => {
 
     const renderEmployee = useCallback((employee: Employee, index: number) => {
         return (
             <List.Item>
-                <EmployeeView value={employee} depth={depth + 1}/>
+                <EmployeeView employee={employee} depth={depth + 1}/>
             </List.Item>
         );
     }, [depth]);
@@ -26,47 +26,47 @@ export const EmployeeView: React.FC<{
                 <div className={`object-view-${depth}`}>
                     <Row>
                         <Col span={LABEL_SPAN}>Id</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.id}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={employee.id}/></Col>
                     </Row>
                     <Row>
                         <Col span={LABEL_SPAN}>Name</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.name}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={employee.name}/></Col>
                     </Row>
                     <Row>
                         <Col span={LABEL_SPAN}>Gender</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.gender}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={employee.gender}/></Col>
                     </Row>
                     <Row>
                         <Col span={LABEL_SPAN}>Salary</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.salary}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={employee.salary}/></Col>
                     </Row>
                     <Row>
-                        <Col span={hasValue(value.department) ? 24 : LABEL_SPAN}>Department</Col>
-                        <Col span={hasValue(value.department) ? 24 : VALUE_SPAN}>
-                            <Value value={value.department}>
+                        <Col span={hasValue(employee.department) ? 24 : LABEL_SPAN}>Department</Col>
+                        <Col span={hasValue(employee.department) ? 24 : VALUE_SPAN}>
+                            <Value value={employee.department}>
                                 <div style={{paddingLeft: '2rem'}}>
-                                    <DepartmentView value={value.department!} depth={depth + 1}/>
+                                    <DepartmentView department={employee.department!} depth={depth + 1}/>
                                 </div>
                             </Value>
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={hasValue(value.supervisor) ? 24 : LABEL_SPAN}>Supervisor</Col>
-                        <Col span={hasValue(value.supervisor) ? 24 : VALUE_SPAN}>
-                            <Value value={value.supervisor}>
+                        <Col span={hasValue(employee.supervisor) ? 24 : LABEL_SPAN}>Supervisor</Col>
+                        <Col span={hasValue(employee.supervisor) ? 24 : VALUE_SPAN}>
+                            <Value value={employee.supervisor}>
                                 <div style={{paddingLeft: '2rem'}}>
-                                    <EmployeeView value={value.supervisor!} depth={depth + 1}/>
+                                    <EmployeeView employee={employee.supervisor!} depth={depth + 1}/>
                                 </div>
                             </Value>
                         </Col>
                     </Row>
                     <Row>
-                        <Col span={hasValue(value.subordinates) ? 24 : LABEL_SPAN}>Subordinates</Col>
-                        <Col span={hasValue(value.subordinates) ? 24 : VALUE_SPAN}>
-                            <Value value={value.subordinates}>
+                        <Col span={hasValue(employee.subordinates) ? 24 : LABEL_SPAN}>Subordinates</Col>
+                        <Col span={hasValue(employee.subordinates) ? 24 : VALUE_SPAN}>
+                            <Value value={employee.subordinates}>
                                 <div style={{paddingLeft: '2rem'}}>
                                     <List<Employee>
-                                    dataSource={value.subordinates}
+                                    dataSource={employee.subordinates}
                                     renderItem={renderEmployee}/>
                                 </div>
                             </Value>

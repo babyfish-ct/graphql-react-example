@@ -10,6 +10,9 @@ import Spin from 'antd/es/spin';
 import List from 'antd/es/list';
 import { EmployeeView } from './EmployeeView';
 import { PaginationConfig } from 'antd/es/pagination';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import Button from 'antd/es/button';
+import { EditDialog } from '../employee/EditDialog';
 
 export const ManagementView: React.FC = () => {
 
@@ -19,7 +22,10 @@ export const ManagementView: React.FC = () => {
 
     const [pageNo, setPageNo] = useState<number>(1);
 
-    const { loading, error, page } = usePageQuery<Employee>({
+    const [creatingDialogVisible, setCreatingDialogVisible] = useState<boolean>(false);
+    const [modifiedId, setModifiedId] = useState<number>();
+
+    const { loading, error, page, refetch } = usePageQuery<Employee>({
         skip: specification.graphQLPaths.length === 0,
         countGraphQL: `query($criteria: EmployeeCriteriaInput) { 
             employeeCount(criteria: $criteria)
@@ -54,10 +60,10 @@ export const ManagementView: React.FC = () => {
         setPageNo(1);
     }, [specification]);
 
-    const renderEmployee = useCallback((department: Employee, index: number): React.ReactNode => {
+    const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
         return (
             <List.Item key={index}>
-                <EmployeeView value={department}/>
+                <EmployeeView employee={employee}/>
             </List.Item>
         );
     }, []);
@@ -74,15 +80,50 @@ export const ManagementView: React.FC = () => {
         }
     }, [page]);
 
+    const openOpenCreatingDialog = useCallback(() => {
+        setCreatingDialogVisible(true);
+    }, []);
+
+    const onCloseCreatingDialog = useCallback((saved: boolean) => {
+        if (saved) {
+            refetch();
+        }
+        setCreatingDialogVisible(false);
+    }, [refetch]);
+
+    const openOpenModifyingDialog = useCallback((modifiedId: number) => {
+        setModifiedId(modifiedId);
+    }, []);
+
+    const onCloseModifyingDialog = useCallback((saved: boolean) => {
+        if (saved) {
+            refetch();
+        }
+        setModifiedId(undefined);
+    }, [refetch]);
+
     return (
         <Layout>
             <Layout.Sider theme="light" width={550}>
                 <div style={{padding: '1rem'}}>
-                    <SpecificationView value={specification} onChange={setSpecification}/>
+                    <SpecificationView specification={specification} onChange={setSpecification}/>
                 </div>
             </Layout.Sider>
             <Layout.Content>
-                <div style={{padding: '1rem'}}>
+                <EditDialog 
+                visible={creatingDialogVisible} 
+                onClose={onCloseCreatingDialog}/>
+                <EditDialog
+                visible={modifiedId !== undefined}
+                id={modifiedId}
+                onClose={onCloseModifyingDialog}/>
+                <div style={{margin: '1rem'}}>
+                    <Button onClick={openOpenCreatingDialog}>
+                        <PlusCircleOutlined />
+                        Create department...
+                    </Button>
+                </div>
+                <div style={{margin: '1rem'}}>
                     {
                         new Case()
                         .when(

@@ -13,43 +13,43 @@ import {
 import { DepartmentSortedType } from '../model/DepartmentSortedType';
 import { DepartmentSpecification } from '../model/DepartmentSpecification';
 import { Key } from 'antd/es/table/interface';
+import { useInputChange, useCheckboxChange } from '../common/Input';
 
 export const SpecificationView: React.FC<{
-    value: DepartmentSpecification,
+    specification: DepartmentSpecification,
     onChange: (value: DepartmentSpecification) => void
-}> = ({value, onChange}) => {
+}> = ({specification: specification, onChange}) => {
 
-    const onNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        const trimedValue = e.target.value.trim();
+    const onNameChange = useInputChange((v: string | undefined) => {
         onChange({
-            ...value,
-            name: trimedValue === "" ? undefined : trimedValue
+            ...specification,
+            name: v
         });
-    }, [value, onChange]);
+    });
 
     const onSortedTypeChange = useCallback((sortedType: DepartmentSortedType) => {
         onChange({
-            ...value,
+            ...specification,
             sortedType
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
-    const onDescendingChange = useCallback((e: CheckboxChangeEvent) => {
+    const onDescendingChange = useCheckboxChange((v: boolean) => {
         onChange({
-            ...value,
-            descending: e.target.checked
+            ...specification,
+            descending: v
         });
-    }, [value, onChange]);
+    });
 
     const onGraphQLPathChange = useCallback((checkedInfo: {checked: Key[]} | Key[]) => {
         const keys = checkedInfo instanceof Array ?
             checkedInfo as string[] :
             checkedInfo.checked as string[]
         onChange({
-            ...value,
+            ...specification,
             graphQLPaths: keys
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     return (
         <Form 
@@ -57,25 +57,25 @@ export const SpecificationView: React.FC<{
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}>
             <Form.Item label="Name">
-                <Input value={value.name} onChange={onNameChange}/>
+                <Input value={specification.name} onChange={onNameChange}/>
             </Form.Item>
             <Form.Item label="Sorted type">
                 <Select<DepartmentSortedType> 
-                value={value.sortedType} 
+                value={specification.sortedType} 
                 onChange={onSortedTypeChange}>
                     <Select.Option value="ID">Id</Select.Option>
                     <Select.Option value="NAME">Name</Select.Option>
                 </Select>
             </Form.Item>
             <Form.Item label="descending">
-                <Checkbox checked={value.descending} onChange={onDescendingChange}/>
+                <Checkbox checked={specification.descending} onChange={onDescendingChange}/>
             </Form.Item>
             <Form.Item label="GraphQL structure">
                 <Tree 
                 checkable 
                 treeData={TREE_NODES} 
                 defaultExpandAll={true}
-                checkedKeys={value.graphQLPaths}
+                checkedKeys={specification.graphQLPaths}
                 onCheck={onGraphQLPathChange}/>
             </Form.Item>
         </Form>

@@ -20,28 +20,6 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const onCreated = useCallback((root: GraphQLRoot<number>) => {
-        Modal.success({
-            title: "Success",
-            content: `Create department successfully, the id of new department is ${unwrapRoot(root)}`
-        });
-        form.resetFields();
-    }, []);
-
-    const onModified = useCallback((root: GraphQLRoot<boolean>) => {
-        Modal.success({
-            title: "Success",
-            content: `Modify department successfully`
-        });
-    }, []);
-
-    const onError = useCallback((error: ApolloError) => {
-        Modal.error({
-            title: "Error",
-            content: `Failed to ${id === undefined ? 'create' : 'modify'} department`
-        });
-    }, []);
-
     const { loading, error, data: departmentRoot } = useQuery<GraphQLRoot<Department>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
@@ -55,7 +33,27 @@ export const EditDialog: React.FC<{
                 name: unwrapRoot(departmentRoot)?.name ?? ""
             });
         }
-    }, [loading, error, departmentRoot, form])
+    }, [loading, error, departmentRoot, form]);
+
+    const onCreated = useCallback((root: GraphQLRoot<number>) => {
+        Modal.success({
+            title: "Success",
+            content: `Create department successfully, the id of new department is ${unwrapRoot(root)}`
+        });
+        form.resetFields();
+    }, []);
+    const onModified = useCallback((root: GraphQLRoot<boolean>) => {
+        Modal.success({
+            title: "Success",
+            content: `Modify department successfully`
+        });
+    }, []);
+    const onError = useCallback((error: ApolloError) => {
+        Modal.error({
+            title: "Error",
+            content: `Failed to ${id === undefined ? 'create' : 'modify'} department`
+        });
+    }, []);
 
     const [create, {loading: creating}] = useMutation(
         CREATE_DOCUMENT_NODE,

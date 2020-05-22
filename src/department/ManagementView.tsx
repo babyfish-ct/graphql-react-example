@@ -60,7 +60,7 @@ export const ManagementView: React.FC = () => {
         return (
             <List.Item key={index}>
                 <DepartmentView 
-                value={department} 
+                department={department} 
                 onEditing={setModifiedId}
                 onDeleted={refetch}/>
             </List.Item>
@@ -105,22 +105,24 @@ export const ManagementView: React.FC = () => {
         <Layout>
             <Layout.Sider theme="light" width={550}>
                 <div style={{padding: '1rem'}}>
-                    <SpecificationView value={specification} onChange={setSpecification}/>
+                    <SpecificationView specification={specification} onChange={setSpecification}/>
                 </div>
             </Layout.Sider>
             <Layout.Content>
-                <div style={{padding: '1rem'}}>
+                <EditDialog 
+                visible={creatingDialogVisible} 
+                onClose={onCloseCreatingDialog}/>
+                <EditDialog 
+                id={modifiedId}
+                visible={modifiedId !== undefined} 
+                onClose={onCloseModifyingDialog}/>
+                <div style={{margin: '1rem'}}>
                     <Button onClick={openOpenCreatingDialog}>
                         <PlusCircleOutlined />
                         Create department...
                     </Button>
-                    <EditDialog 
-                    visible={creatingDialogVisible} 
-                    onClose={onCloseCreatingDialog}/>
-                    <EditDialog 
-                    id={modifiedId}
-                    visible={modifiedId !== undefined} 
-                    onClose={onCloseModifyingDialog}/>
+                </div>
+                <div style={{margin: '1rem'}}>
                     {
                         new Case()
                         .when(

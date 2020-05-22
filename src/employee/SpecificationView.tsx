@@ -18,20 +18,20 @@ import { Gender } from '../model/Gender';
 import { numberOf } from '../common/Number';
 
 export const SpecificationView: React.FC<{
-    value: EmployeeSpecification,
+    specification: EmployeeSpecification,
     onChange: (value: EmployeeSpecification) => void
-}> = ({value, onChange}) => {
+}> = ({specification: specification, onChange}) => {
 
     const onNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const trimedValue = e.target.value.trim();
         onChange({
-            ...value,
+            ...specification,
             criteria: {
-                ...value.criteria,
+                ...specification.criteria,
                 name: trimedValue === "" ? undefined : trimedValue
             }
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onGenderChange = useCallback((v: string) => {
         const gender: Gender | undefined = 
@@ -39,57 +39,57 @@ export const SpecificationView: React.FC<{
             v as Gender :
             undefined;
         onChange({
-            ...value,
+            ...specification,
             criteria: {
-                ...value.criteria,
+                ...specification.criteria,
                 gender
             }
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onMinSalaryChange = useCallback((v: number | string | undefined) => {
         onChange({
-            ...value,
+            ...specification,
             criteria: {
-                ...value.criteria,
+                ...specification.criteria,
                 minSalary: numberOf(v)
             }
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onMaxSalaryChange = useCallback((v: number | string | undefined) => {
         onChange({
-            ...value,
+            ...specification,
             criteria: {
-                ...value.criteria,
+                ...specification.criteria,
                 maxSalary: numberOf(v)
             }
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onSortedTypeChange = useCallback((sortedType: EmployeeSortedType) => {
         onChange({
-            ...value,
+            ...specification,
             sortedType
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onDescendingChange = useCallback((e: CheckboxChangeEvent) => {
         onChange({
-            ...value,
+            ...specification,
             descending: e.target.checked
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     const onGraphQLPathChange = useCallback((checkedInfo: {checked: Key[]} | Key[]) => {
         const keys = checkedInfo instanceof Array ?
             checkedInfo as string[] :
             checkedInfo.checked as string[]
         onChange({
-            ...value,
+            ...specification,
             graphQLPaths: keys
         });
-    }, [value, onChange]);
+    }, [specification, onChange]);
 
     return (
         <Form
@@ -97,11 +97,11 @@ export const SpecificationView: React.FC<{
         labelCol={{span: 8}}
         wrapperCol={{span: 16}}>
             <Form.Item label="Name">
-                <Input value={value.criteria?.name} onChange={onNameChange}/>
+                <Input value={specification.criteria?.name} onChange={onNameChange}/>
             </Form.Item>
             <Form.Item label="Gender">
                 <Select<string>
-                value={value.criteria?.gender ?? "ANY"}
+                value={specification.criteria?.gender ?? "ANY"}
                 onChange={onGenderChange}>
                     <Select.Option value="ANY">--Any--</Select.Option>
                     <Select.Option value="MALE">Male</Select.Option>
@@ -109,13 +109,13 @@ export const SpecificationView: React.FC<{
                 </Select>
             </Form.Item>
             <Form.Item label="Min Salary">
-                <InputNumber min={0} value={value.criteria?.minSalary} onChange={onMinSalaryChange}/>
+                <InputNumber min={0} value={specification.criteria?.minSalary} onChange={onMinSalaryChange}/>
             </Form.Item>
             <Form.Item label="Max Salary">
-                <InputNumber min={0} value={value.criteria?.maxSalary} onChange={onMaxSalaryChange}/>
+                <InputNumber min={0} value={specification.criteria?.maxSalary} onChange={onMaxSalaryChange}/>
             </Form.Item>
             <Form.Item label="Sorted type">
-                <Select<EmployeeSortedType> value={value.sortedType} onChange={onSortedTypeChange}>
+                <Select<EmployeeSortedType> value={specification.sortedType} onChange={onSortedTypeChange}>
                     <Select.Option value="ID">Id</Select.Option>
                     <Select.Option value="NAME">Name</Select.Option>
                     <Select.Option value="SALARY">Salary</Select.Option>
@@ -124,7 +124,7 @@ export const SpecificationView: React.FC<{
                 </Select>
             </Form.Item>
             <Form.Item label="descending">
-                <Checkbox checked={value.descending} onChange={onDescendingChange}/>
+                <Checkbox checked={specification.descending} onChange={onDescendingChange}/>
             </Form.Item>
             <Form.Item label="GraphQL structure">
                 <Tree

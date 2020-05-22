@@ -16,16 +16,16 @@ import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
 
 export const DepartmentView: React.FC<{
-    value: Department,
+    department: Department,
     depth?: number,
     onEditing?: (id: number) => void
     onDeleted?: (id: number) => void
-}> = ({value, depth = 1, onEditing, onDeleted}) => {
+}> = ({department: value, depth = 1, onEditing, onDeleted}) => {
 
     const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
         return (
             <List.Item key={index}>
-                <EmployeeView value={employee} depth={depth + 1}/>
+                <EmployeeView employee={employee} depth={depth + 1}/>
             </List.Item>
         );
     }, [depth]);
