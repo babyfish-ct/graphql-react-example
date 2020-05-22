@@ -18,6 +18,7 @@ export interface PageResult<TEntity> {
     readonly error?: ApolloError;
     readonly loading: boolean;
     readonly called: boolean;
+    readonly refetch: () => void;
 }
 
 export interface PageQueryArgs {
@@ -127,11 +128,20 @@ export function usePageQuery<TEntity = any>({
                 entities: list
             };
         }
+        const refetch = () => {
+            if (countResult.refetch !== undefined) {
+                countResult.refetch();
+            }
+            if (listResult.refetch !== undefined) {
+                listResult.refetch();
+            }
+        };
         return {
             page,
             error: listResult.error ?? countResult.error,
             loading: listResult.loading || countResult.loading,
-            called: listResult.called
+            called: listResult.called,
+            refetch
         };
     }, [countResult, listResult, rowCount, pageCount, list, skip, actualPageNo, pageSize]);
 }

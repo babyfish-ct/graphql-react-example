@@ -20,7 +20,7 @@ export const ManagementView: React.FC = () => {
     const [pageNo, setPageNo] = useState<number>(1);
     const [dialogVisible, setDialogVisible] = useState<boolean>(false);
 
-    const { loading, error, page } = usePageQuery<Department>({
+    const { loading, error, page, refetch } = usePageQuery<Department>({
         skip: specification.graphQLPaths.length === 0,
         countGraphQL: `query($name: String) { 
             departmentCount(name: $name)
@@ -61,7 +61,7 @@ export const ManagementView: React.FC = () => {
                 <DepartmentView value={department}/>
             </List.Item>
         );
-    }, []);
+    }, [refetch]);
 
     const pagination = useMemo<PaginationConfig | undefined>(() => {
         if (page === undefined) {
@@ -80,8 +80,12 @@ export const ManagementView: React.FC = () => {
     }, []);
 
     const onCloseDialog = useCallback((saved: boolean) => {
+        if (saved) {
+            refetch();
+            console.log('refetch');
+        }
         setDialogVisible(false);
-    }, []);
+    }, [refetch]);
 
     return (
         <Layout>
