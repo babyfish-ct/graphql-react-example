@@ -23,7 +23,6 @@ export const ManagementView: React.FC = () => {
     const [pageNo, setPageNo] = useState<number>(1);
 
     const [creatingDialogVisible, setCreatingDialogVisible] = useState<boolean>(false);
-    const [modifiedId, setModifiedId] = useState<number>();
 
     const { loading, error, page, refetch } = usePageQuery<Employee>({
         skip: specification.graphQLPaths.length === 0,
@@ -60,14 +59,6 @@ export const ManagementView: React.FC = () => {
         setPageNo(1);
     }, [specification]);
 
-    const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
-        return (
-            <List.Item key={index}>
-                <EmployeeView employee={employee}/>
-            </List.Item>
-        );
-    }, []);
-
     const pagination = useMemo<PaginationConfig | undefined>(() => {
         if (page === undefined) {
             return undefined
@@ -91,12 +82,20 @@ export const ManagementView: React.FC = () => {
         setCreatingDialogVisible(false);
     }, [refetch]);
 
-    const onCloseModifyingDialog = useCallback((saved: boolean) => {
-        if (saved) {
-            refetch();
-        }
-        setModifiedId(undefined);
+    const onEditOrDelete = useCallback((id: number) => {
+        refetch();
     }, [refetch]);
+
+    const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
+        return (
+            <List.Item key={index}>
+                <EmployeeView 
+                employee={employee}
+                onEdit={onEditOrDelete}
+                onDelete={onEditOrDelete}/>
+            </List.Item>
+        );
+    }, [onEditOrDelete]);
 
     return (
         <Layout>
@@ -109,10 +108,6 @@ export const ManagementView: React.FC = () => {
                 <EditDialog 
                 visible={creatingDialogVisible} 
                 onClose={onCloseCreatingDialog}/>
-                <EditDialog
-                visible={modifiedId !== undefined}
-                id={modifiedId}
-                onClose={onCloseModifyingDialog}/>
                 <div style={{margin: '1rem'}}>
                     <Button onClick={openOpenCreatingDialog}>
                         <PlusCircleOutlined />

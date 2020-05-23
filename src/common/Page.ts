@@ -136,10 +136,31 @@ export function usePageQuery<TEntity = any>({
             };
         }
         const refetch = () => {
-            if (countResult.refetch !== undefined) {
+
+            /*
+             * The wrapper refetch method don't invoke the 
+             * target refetch methods if skip attribute is true
+             * 
+             * @apollo/react-hooks has a problem:
+             * When  
+             *     1. skip is true
+             *     2. use dynamic graphql(like this demo)
+             * refetch method will cause an exception to tell the
+             * developer cannot change the graphql string of existing query.
+             * 
+             * Please read 
+             * https://github.com/apollographql/apollo-feature-requests/issues/77
+             * to know more
+             * 
+             * You needn't to do it like this in real business projects,
+             * because graphql query string is static in those projects.
+             * This demo need to do it like this because this demo uses
+             * dynamic graphql query that won't be used in real business projects
+             */
+            if (!skip && countResult.refetch !== undefined) {
                 countResult.refetch();
             }
-            if (listResult.refetch !== undefined) {
+            if (!skipList && listResult.refetch !== undefined) {
                 listResult.refetch();
             }
         };
@@ -150,15 +171,9 @@ export function usePageQuery<TEntity = any>({
             called: listResult.called,
             refetch
         };
-    }, [countResult, listResult, rowCount, pageCount, list, skip, actualPageNo, pageSize]);
+    }, [countResult, listResult, rowCount, pageCount, list, skip, skipList, actualPageNo, pageSize]);
 }
 
-// When 
-//     1. skip is true
-//     2. use dynamic graphql(like this demo)
-// please use a this invalid query,
-// 
-// https://github.com/apollographql/apollo-feature-requests/issues/77
 const INVALID_QUERY: DocumentNode = 
     gql`query {
         __schema {

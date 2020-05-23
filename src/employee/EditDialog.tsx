@@ -29,15 +29,23 @@ export const EditDialog: React.FC<{
     const { loading, error, data: employeeRoot } = useQuery<GraphQLRoot<Employee>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
+            fetchPolicy: 'no-cache',
             skip: id === undefined,
             variables: { id }
         }
     );
     useEffect(() => {
         if (!loading && error === undefined && employeeRoot !== undefined) {
-            form.setFieldsValue({
-                name: unwrapRoot(employeeRoot)?.name ?? ""
-            });
+            const employee = unwrapRoot(employeeRoot);
+            if (employee !== undefined) {
+                form.setFieldsValue({
+                    name: employee.name,
+                    gender: employee.gender,
+                    salary: employee.salary,
+                    departmentId: employee.department!.id,
+                    supervisorId: employee.supervisor?.id
+                });
+            }
         }
     }, [loading, error, employeeRoot, form]);
 
@@ -186,5 +194,13 @@ const GET_BY_ID_DOCUMENT_NODE: DocumentNode =
     gql`query($id: Long!) {
         employee(id: $id) {
             name
+            gender
+            salary
+            department {
+                id
+            }
+            supervisor {
+                id
+            }
         }
     }`;

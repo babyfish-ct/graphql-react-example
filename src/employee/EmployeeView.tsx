@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Employee } from '../model/Employee';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -13,13 +13,16 @@ import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
 import { DocumentNode } from 'graphql';
 import { gql } from 'apollo-boost';
+import { EditDialog } from '../employee/EditDialog';
 
 export const EmployeeView: React.FC<{
     employee: Employee,
     depth?: number,
-    onEditing?: (id: number) => void
-    onDeleted?: (id: number) => void
-}> = ({employee, depth = 1, onEditing, onDeleted}) => {
+    onEdit?: (id: number) => void,
+    onDelete?: (id: number) => void
+}> = ({employee, depth = 1, onEdit, onDelete}) => {
+
+    const [dialog, setDialog] = useState<boolean>(false);
 
     const renderEmployee = useCallback((employee: Employee, index: number) => {
         return (
@@ -46,19 +49,23 @@ export const EmployeeView: React.FC<{
         }
     );
 
-    const onEdit = useCallback(() => {
-        if (onEditing !== undefined) {
-            onEditing(employee.id ?? -1);
+    const onEditClick = useCallback(() => {
+        setDialog(true);
+    }, []);
+    const onDialogClose = useCallback((saved: boolean) => {
+        setDialog(false);
+        if (onEdit !== undefined) {
+            onEdit(employee.id!);
         }
-    }, [employee, onEditing]);
+    }, [onEdit, employee]);
 
     const onConfirmDelete = useCallback(async () => {
         if (await delete_() !== undefined) {
-            if (onDeleted !== undefined) {
-                onDeleted(employee.id ?? -1);
+            if (onDelete !== undefined) {
+                onDelete(employee.id ?? -1);
             }
         }
-    }, [employee, delete_, onDeleted]);
+    }, [employee, delete_, onDelete]);
 
     return (
         <div style={{flex:1}}>
@@ -77,7 +84,7 @@ export const EmployeeView: React.FC<{
                     {
                         depth === 1 && employee.id !== undefined?
                         <Button.Group>
-                            <Button onClick={onEdit}>
+                            <Button onClick={onEditClick}>
                                 <EditOutlined />Edit
                             </Button>
                             <Popconfirm
@@ -150,6 +157,23 @@ export const EmployeeView: React.FC<{
                     </Row>
                 </div>
             </Card>
+            {
+                /*
+                 * The attribute 'visible' of EditDialog always is true,
+                 * but use the boolean flag to decide whether the dialog should be rendered or not.
+                 * 
+                 * This is because the parent componnement uses 
+                 * the current EmployeeView component in the loop,
+                 * don't always create the dialog for each EmployeeView,
+                 * just created it when it's necessary
+                 */
+                dialog ?
+                <EditDialog 
+                visible={true}
+                id={employee.id}
+                onClose={onDialogClose}/> : 
+                undefined
+            }
         </div>
     );
 };
