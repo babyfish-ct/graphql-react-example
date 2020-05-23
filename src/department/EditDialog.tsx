@@ -23,7 +23,6 @@ export const EditDialog: React.FC<{
     const { loading, error, data: departmentRoot } = useQuery<GraphQLRoot<Department>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
-            fetchPolicy: 'no-cache',
             skip: id === undefined,
             variables: { id }
         }
@@ -73,6 +72,7 @@ export const EditDialog: React.FC<{
     );
 
     const onSubmit = useCallback(async () => {
+        await form.validateFields();
         if (await (id === undefined ? create : modify)({
             variables: {
                 id, 
@@ -126,7 +126,7 @@ export const EditDialog: React.FC<{
                                         <LoadingOutlined/> : 
                                         undefined 
                                     }
-                                    Save
+                                    { id === undefined ? 'Create' : 'Modify'}
                                 </Button>
                             </div>
                         )

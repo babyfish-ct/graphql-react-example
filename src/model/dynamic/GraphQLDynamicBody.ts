@@ -1,4 +1,33 @@
-
+/*
+ * The antd tree returns the selected keys like this
+ * [
+ *    'id',
+ *    'name',
+ *    'employees.id',
+ *    'employees.name',
+ *    'employees.gender',
+ *    'employees.supervisor.id',
+ *    'employees.supervisor.name',
+ *    'employees.supervisor.gender'
+ * ]
+ * 
+ * This method merge the paths and return the dynamic fetch structure of graphql, like this
+ * 
+ * `
+ *     id
+ *     name
+ *     employees {
+ *          id
+ *          name
+ *          gender
+ *          supervisor {
+ *              id
+ *              name
+ *              gender
+ *          }
+ *     }
+ * `
+ */
 export function createDynamicGraphQLBody(paths: string[]): string {
     if (paths.length === 0) {
         return "__typename";
@@ -10,7 +39,7 @@ export function createDynamicGraphQLBody(paths: string[]): string {
     return builder.build(0);
 }
 
-export class GraphQLNodeBuilder {
+class GraphQLNodeBuilder {
     
     // Map + List = OrderedMap(like java.util.LinkedHashMap)
     private childMap: {[key: string]: GraphQLNodeBuilder} = {};

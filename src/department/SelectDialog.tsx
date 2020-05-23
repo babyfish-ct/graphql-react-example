@@ -35,7 +35,6 @@ export const SelectDialog: React.FC<{
         pageNo,
         pageSize: DEFAULT_LIST_PAGE_SIZE,
         options: {
-            fetchPolicy: 'no-cache',
             variables: {name}
         }
     });

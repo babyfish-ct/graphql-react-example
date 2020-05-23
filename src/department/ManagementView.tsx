@@ -44,7 +44,6 @@ export const ManagementView: React.FC = () => {
         pageNo,
         pageSize: DEFAULT_LIST_PAGE_SIZE,
         options: {
-            fetchPolicy: 'no-cache',
             variables: {
                 name: specification.name,
                 sortedType: specification.sortedType,
@@ -58,11 +57,19 @@ export const ManagementView: React.FC = () => {
 
     const renderDepartment = useCallback((department: Department, index: number): ReactNode => {
         return (
+            /*
+             * For real business projects, assign the object id to the 'key' is the best choice,
+             * 
+             * but this demo shows the dynamic query so that the object id may be undefined,
+             * there is no better choice except set the 'key' as index
+             * 
+             * It's unnecessary to use the index in real business projects
+             */
             <List.Item key={index}>
                 <DepartmentView 
                 department={department} 
-                onEditing={setModifiedId}
-                onDeleted={refetch}/>
+                onEdit={refetch}
+                onDelete={refetch}/>
             </List.Item>
         );
     }, [refetch]);

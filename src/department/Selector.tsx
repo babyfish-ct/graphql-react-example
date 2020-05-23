@@ -51,7 +51,6 @@ export const Selector: React.FC<{
     const {loading, error, data: departmentRoot} = useQuery<GraphQLRoot<Department>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
-            fetchPolicy: 'no-cache',
             skip: id === undefined,
             variables: { id }
             

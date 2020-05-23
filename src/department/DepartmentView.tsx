@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Department } from '../model/Department';
 import Row from 'antd/es/row';
 import Col from 'antd/es/col';
@@ -14,16 +14,27 @@ import { DocumentNode } from 'graphql';
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
+import { EditDialog } from './EditDialog';
 
 export const DepartmentView: React.FC<{
     department: Department,
     depth?: number,
-    onEditing?: (id: number) => void
-    onDeleted?: (id: number) => void
-}> = ({department, depth = 1, onEditing, onDeleted}) => {
+    onEdit?: (id: number) => void
+    onDelete?: (id: number) => void
+}> = ({department, depth = 1, onEdit, onDelete}) => {
+
+    const [dialog, setDialog] = useState<boolean>(false);
 
     const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
         return (
+            /*
+             * For real business projects, assign the object id to the 'key' is the best choice,
+             * 
+             * but this demo shows the dynamic query so that the object id may be undefined,
+             * there is no better choice except set the 'key' as index
+             * 
+             * It's unnecessary to use the index in real business projects
+             */
             <List.Item key={index}>
                 <EmployeeView employee={employee} depth={depth + 1}/>
             </List.Item>
@@ -47,19 +58,23 @@ export const DepartmentView: React.FC<{
         }
     );
 
-    const onEdit = useCallback(() => {
-        if (onEditing !== undefined) {
-            onEditing(department.id ?? -1);
+    const onEditClick = useCallback(() => {
+        setDialog(true);
+    }, []);
+    const onDialogClose = useCallback((saved: boolean) => {
+        setDialog(false);
+        if (onEdit !== undefined) {
+            onEdit(department.id!);
         }
-    }, [department, onEditing]);
+    }, [onEdit, department]);
 
     const onConfirmDelete = useCallback(async () => {
         if (await delete_() !== undefined) {
-            if (onDeleted !== undefined) {
-                onDeleted(department.id ?? -1);
+            if (onDelete !== undefined) {
+                onDelete(department.id ?? -1);
             }
         }
-    }, [department, delete_, onDeleted]);
+    }, [department, delete_, onDelete]);
 
     return (
         <div style={{flex: 1}}>
@@ -78,7 +93,7 @@ export const DepartmentView: React.FC<{
                     {
                         depth === 1 && department.id !== undefined?
                         <Button.Group>
-                            <Button onClick={onEdit}>
+                            <Button onClick={onEditClick}>
                                 <EditOutlined />Edit
                             </Button>
                             <Popconfirm
@@ -127,6 +142,23 @@ export const DepartmentView: React.FC<{
                     </Row>
                 </div>
             </Card>
+            {
+                /*
+                 * The attribute 'visible' of EditDialog always is true,
+                 * but use the boolean flag to decide whether the dialog should be rendered or not.
+                 * 
+                 * This is because the parent componnement uses 
+                 * the current EmployeeView component in the loop,
+                 * don't always create the dialog for each EmployeeView,
+                 * just created it when it's necessary
+                 */
+                dialog ?
+                <EditDialog 
+                visible={true}
+                id={department.id}
+                onClose={onDialogClose}/> : 
+                undefined
+            }
         </div>
     );
 };

@@ -61,7 +61,6 @@ export function TypedFrom<T>({defination, ...formProps}: TypedFromProps<T>): JSX
                         form === undefined ?
                         () => footerCreator(false) :
                         () => footerCreator(
-                            !form.isFieldsTouched(true) ||
                             form.getFieldsError().filter(
                                 ({errors}) => errors.length
                             ).length !== 0

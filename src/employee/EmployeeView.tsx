@@ -26,7 +26,15 @@ export const EmployeeView: React.FC<{
 
     const renderEmployee = useCallback((employee: Employee, index: number) => {
         return (
-            <List.Item>
+            /*
+             * For real business projects, assign the object id to the 'key' is the best choice,
+             * 
+             * but this demo shows the dynamic query so that the object id may be undefined,
+             * there is no better choice except set the 'key' as index
+             * 
+             * It's unnecessary to use the index in real business projects
+             */
+            <List.Item key={index}>
                 <EmployeeView employee={employee} depth={depth + 1}/>
             </List.Item>
         );
