@@ -66,6 +66,7 @@ export const EditDialog: React.FC<{
             title: "Error",
             content: `Failed to ${id === undefined ? 'create' : 'modify'} employee`
         });
+        console.log(JSON.stringify(error));
     }, [id]);
 
     const [create, {loading: creating}] = useMutation(

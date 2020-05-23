@@ -13,6 +13,20 @@ export function hasValue<T>(value: T | null | undefined): boolean {
     return true;
 }
 
+/*
+ * undefined: render 'Not loaded'
+ * null: render 'No data'
+ * 
+ * please see ../model/graphql/GraphQLField.ts to know more
+ * 
+ * 
+ * array with no elements: render 'Empty list'
+ * 
+ * 
+ * otherwise:
+ *     1. If this element has no children, render the simple value
+ *     2. If this element has some children, render the complex UI specified by children
+ */
 export class Value<T> extends PureComponent<
     PropsWithChildren<{
         value: T | null | undefined

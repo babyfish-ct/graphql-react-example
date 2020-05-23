@@ -102,7 +102,8 @@ export const SelectDialog: React.FC<{
                     pagination={pagination}
                     rowKey="id"
                     rowSelection={rowSelection}
-                    onRow={onRow}>
+                    onRow={onRow}
+                    size="small">
                         <Table.Column
                         dataIndex="id"
                         title="Id"/>

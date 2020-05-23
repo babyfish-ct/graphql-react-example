@@ -32,6 +32,13 @@ export interface PageQueryArgs {
     offsetArgumentName?: string
 }
 
+/*
+ * The server side support two endpoints:
+ *     1. Query the total row count
+ *     2. Query the rows in a page
+ * 
+ * This custom hook combine this together
+ */
 export function usePageQuery<TEntity = any>({
     skip = false,
     countGraphQL,
@@ -48,11 +55,8 @@ export function usePageQuery<TEntity = any>({
     }
 
     const countGraphQLNode = useMemo<DocumentNode>(() => {
-        if (skip) {
-            return INVALID_QUERY;
-        }
         return gql(countGraphQL)
-    }, [countGraphQL, skip]);
+    }, [countGraphQL]);
     const countGraphQLOptions = useMemo<QueryHookOptions<GraphQLRoot<number>>>(() => {
         return { ...options, skip };
     }, [skip, options]);
@@ -173,12 +177,5 @@ export function usePageQuery<TEntity = any>({
         };
     }, [countResult, listResult, rowCount, pageCount, list, skip, skipList, actualPageNo, pageSize]);
 }
-
-const INVALID_QUERY: DocumentNode = 
-    gql`query {
-        __schema {
-            __typename
-        }
-    }`;
 
 export const DEFAULT_LIST_PAGE_SIZE = 5;

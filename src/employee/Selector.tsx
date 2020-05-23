@@ -9,6 +9,7 @@ import { useQuery } from '@apollo/react-hooks';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { Case } from '../common/Case';
 import Spin from 'antd/es/spin';
+import { ClearOutlined } from '@ant-design/icons'; 
 
 /**
  * The form of ANTD support custom form control
@@ -19,8 +20,9 @@ import Spin from 'antd/es/spin';
  */
 export const Selector: React.FC<{
     value?: number,
+    required?: boolean,
     onChange?: (value?: number) => void
-}> = ({value, onChange}) => {
+}> = ({value, required = false, onChange}) => {
 
     // the state of the custom control
     const [id, setId] = useState<number>();
@@ -76,11 +78,15 @@ export const Selector: React.FC<{
             <div style={{flex: 1}}>
                 <Input readOnly value={employee?.name} onClick={onInputClick}/>
             </div>
-            <div>
-                <Button onClick={onClearClick}>
-                    清除
-                </Button>
-            </div>
+            {
+                required ?
+                undefined : 
+                <div>
+                    <Button onClick={onClearClick}>
+                        <ClearOutlined />Clear
+                    </Button>
+                </div>
+            }
             <SelectDialog 
             visible={dialogVisible}
             id={value}
