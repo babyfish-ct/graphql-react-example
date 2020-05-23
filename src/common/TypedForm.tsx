@@ -33,11 +33,13 @@ export function TypedFrom<T>({defination, ...formProps}: TypedFromProps<T>): JSX
     const { form } = formProps;
 
     const [, forceUpdate] = useState<boolean>(false);
+
+    // force update the <Form.Item shouldUpate={true}> after mounted
     useEffect(() => {
         if (footerCreator !== undefined && form !== undefined) {
             forceUpdate(true);
         }
-    }, []); // force update the <Form.Item shouldUpate={true}> after mounted
+    }, [form, footerCreator, forceUpdate]); 
 
     return (
         <Form {...formProps}>

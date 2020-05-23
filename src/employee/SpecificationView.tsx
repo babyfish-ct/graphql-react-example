@@ -20,7 +20,7 @@ import { numberOf } from '../common/Number';
 export const SpecificationView: React.FC<{
     specification: EmployeeSpecification,
     onChange: (value: EmployeeSpecification) => void
-}> = ({specification: specification, onChange}) => {
+}> = ({specification, onChange}) => {
 
     const onNameChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
         const trimedValue = e.target.value.trim();

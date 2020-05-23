@@ -2,7 +2,7 @@ import React, { useState, useMemo, useCallback, HTMLAttributes } from 'react';
 import Modal from 'antd/es/modal';
 import Table, { TablePaginationConfig } from 'antd/es/table';
 import { usePageQuery, DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
-import { Department } from '../model/Department';
+import { Employee } from '../model/Employee';
 import { Case } from '../common/Case';
 import Spin from 'antd/es/spin';
 import Form from 'antd/es/form';
@@ -22,12 +22,12 @@ export const SelectDialog: React.FC<{
 
     const [selectedKey, setSelectedKey] = useState<number>();
 
-    const { loading, error, page } = usePageQuery<Department>({
+    const { loading, error, page } = usePageQuery<Employee>({
         countGraphQL: `query($name: String) {
-            departmentCount(name: $name)
+            employeeCount(criteria: { name: $name })
         }`,
         listGraphQL: `query($name: String, $limit: Int, $offset: Int) {
-            departments(name: $name, sortedType: NAME, descending: false, limit: $limit, offset: $offset) {
+            employees(criteria: { name: $name }, sortedType: NAME, descending: false, limit: $limit, offset: $offset) {
                 id
                 name
             }
@@ -49,20 +49,20 @@ export const SelectDialog: React.FC<{
             onChange: (v: number) => { setPageNo(v); }
         };
     }, [loading, error, page]);
-    const rowSelection = useMemo<TableRowSelection<Department>>(() => {
+    const rowSelection = useMemo<TableRowSelection<Employee>>(() => {
         return { 
             type: 'radio',
             selectedRowKeys: selectedKey === undefined ? [] : [selectedKey],
-            onChange: (selectedRowKeys: Key[], selectedRows: Department[]) => {
+            onChange: (selectedRowKeys: Key[], selectedRows: Employee[]) => {
                 setSelectedKey(selectedRowKeys[0] as number);
             }
         };
     }, [selectedKey]);
     const onRow = useCallback(
-        (department: Department, index: number | undefined): 
+        (employee: Employee, index: number | undefined): 
         HTMLAttributes<HTMLElement> => {
         return {
-            onClick: () => { setSelectedKey(department.id); }
+            onClick: () => { setSelectedKey(employee.id); }
         };
     }, []);
 
@@ -75,7 +75,7 @@ export const SelectDialog: React.FC<{
 
     return (
         <Modal
-        title='Select department'
+        title='Select employee'
         visible={visible}
         width={500}
         onOk={onOk}
@@ -96,7 +96,7 @@ export const SelectDialog: React.FC<{
                     <div>Load failed</div>
                 )
                 .otherwise(
-                    <Table<Department>
+                    <Table<Employee>
                     dataSource={page?.entities}
                     pagination={pagination}
                     rowKey="id"

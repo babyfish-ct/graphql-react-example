@@ -91,10 +91,6 @@ export const ManagementView: React.FC = () => {
         setCreatingDialogVisible(false);
     }, [refetch]);
 
-    const openOpenModifyingDialog = useCallback((modifiedId: number) => {
-        setModifiedId(modifiedId);
-    }, []);
-
     const onCloseModifyingDialog = useCallback((saved: boolean) => {
         if (saved) {
             refetch();
@@ -120,7 +116,7 @@ export const ManagementView: React.FC = () => {
                 <div style={{margin: '1rem'}}>
                     <Button onClick={openOpenCreatingDialog}>
                         <PlusCircleOutlined />
-                        Create department...
+                        Create employee...
                     </Button>
                 </div>
                 <div style={{margin: '1rem'}}>

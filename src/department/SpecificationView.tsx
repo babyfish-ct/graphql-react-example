@@ -1,7 +1,7 @@
-import React, { useCallback, ChangeEvent } from 'react';
+import React, { useCallback } from 'react';
 import Form from 'antd/es/form';
 import Input from 'antd/es/input';
-import Checkbox, { CheckboxChangeEvent } from 'antd/es/checkbox';
+import Checkbox from 'antd/es/checkbox';
 import Select from 'antd/es/select';
 import Tree from 'antd/es/tree';
 import { 
@@ -18,7 +18,7 @@ import { useInputChange, useCheckboxChange } from '../common/Input';
 export const SpecificationView: React.FC<{
     specification: DepartmentSpecification,
     onChange: (value: DepartmentSpecification) => void
-}> = ({specification: specification, onChange}) => {
+}> = ({specification, onChange}) => {
 
     const onNameChange = useInputChange((v: string | undefined) => {
         onChange({

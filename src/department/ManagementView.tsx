@@ -90,10 +90,6 @@ export const ManagementView: React.FC = () => {
         setCreatingDialogVisible(false);
     }, [refetch]);
 
-    const openOpenModifyingDialog = useCallback((modifiedId: number) => {
-        setModifiedId(modifiedId);
-    }, []);
-
     const onCloseModifyingDialog = useCallback((saved: boolean) => {
         if (saved) {
             refetch();

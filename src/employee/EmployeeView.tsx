@@ -6,11 +6,20 @@ import { Value, hasValue } from '../common/Value';
 import List from 'antd/es/list';
 import { DepartmentView } from '../department/DepartmentView';
 import Card from 'antd/es/card';
+import Button from 'antd/es/button';
+import Popconfirm from 'antd/es/popconfirm';
+import { EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
+import { useMutation } from '@apollo/react-hooks';
+import Modal from 'antd/es/modal';
+import { DocumentNode } from 'graphql';
+import { gql } from 'apollo-boost';
 
 export const EmployeeView: React.FC<{
     employee: Employee,
-    depth?: number
-}> = ({employee, depth = 1}) => {
+    depth?: number,
+    onEditing?: (id: number) => void
+    onDeleted?: (id: number) => void
+}> = ({employee, depth = 1, onEditing, onDeleted}) => {
 
     const renderEmployee = useCallback((employee: Employee, index: number) => {
         return (
@@ -20,9 +29,76 @@ export const EmployeeView: React.FC<{
         );
     }, [depth]);
 
+    const [delete_, { loading }] = useMutation(
+        DELETE_DOCUMENT_NODE,
+        {
+            variables: { id: employee.id },
+            onCompleted: () => {
+                Modal.success({
+                    title: "Employee has been deleted"
+                });
+            },
+            onError: () => {
+                Modal.error({
+                    content: "Failed to delete the employee"
+                });
+            }
+        }
+    );
+
+    const onEdit = useCallback(() => {
+        if (onEditing !== undefined) {
+            onEditing(employee.id ?? -1);
+        }
+    }, [employee, onEditing]);
+
+    const onConfirmDelete = useCallback(async () => {
+        if (await delete_() !== undefined) {
+            if (onDeleted !== undefined) {
+                onDeleted(employee.id ?? -1);
+            }
+        }
+    }, [employee, delete_, onDeleted]);
+
     return (
         <div style={{flex:1}}>
-            <Card title={`Employee(Level-${depth})`}>
+            <Card title={
+                <div style={{display: 'flex'}}>
+                    <div style={{flex: 1}}>
+                        Employee(Level-{depth})
+                    </div>
+                    {
+                        depth === 1 && employee.id === undefined ?
+                        <div style={{fontSize: 12, fontWeight: 'normal'}}>
+                            Cannot edit/delete because there's no id
+                        </div> :
+                        undefined
+                    }
+                    {
+                        depth === 1 && employee.id !== undefined?
+                        <Button.Group>
+                            <Button onClick={onEdit}>
+                                <EditOutlined />Edit
+                            </Button>
+                            <Popconfirm
+                            title="Are you sure delete this employee?"
+                            onConfirm={onConfirmDelete}
+                            okText="Yes"
+                            cancelText="No">
+                                <Button disabled={loading}>
+                                    {
+                                        loading ?
+                                        <LoadingOutlined/> :
+                                        <DeleteOutlined/>
+                                    }
+                                    Delete
+                                </Button>
+                            </Popconfirm>
+                        </Button.Group> :
+                        undefined
+                    }
+                </div>
+            }>
                 <div className={`object-view-${depth}`}>
                     <Row>
                         <Col span={LABEL_SPAN}>Id</Col>
@@ -80,3 +156,8 @@ export const EmployeeView: React.FC<{
 
 const LABEL_SPAN = 8;
 const VALUE_SPAN = 24 - LABEL_SPAN;
+
+const DELETE_DOCUMENT_NODE: DocumentNode = 
+    gql`mutation($id: Long!) {
+        deleteEmployee(id: $id)
+    }`;

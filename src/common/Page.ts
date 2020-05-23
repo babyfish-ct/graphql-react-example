@@ -48,8 +48,11 @@ export function usePageQuery<TEntity = any>({
     }
 
     const countGraphQLNode = useMemo<DocumentNode>(() => {
+        if (skip) {
+            return INVALID_QUERY;
+        }
         return gql(countGraphQL)
-    }, [countGraphQL]);
+    }, [countGraphQL, skip]);
     const countGraphQLOptions = useMemo<QueryHookOptions<GraphQLRoot<number>>>(() => {
         return { ...options, skip };
     }, [skip, options]);
@@ -77,20 +80,24 @@ export function usePageQuery<TEntity = any>({
         return Math.max(1, Math.min(pageCount, pageNo));
     }, [pageNo, pageCount]);
 
+    const skipList = useMemo<boolean>(() => {
+        return skip || actualPageNo === undefined || pageCount === 0
+    }, [skip, actualPageNo, pageCount]);
     const listGraphQLNode = useMemo<DocumentNode>(() => {
+        if (skip) {}
         return gql(listGraphQL);
-    }, [listGraphQL]);
+    }, [listGraphQL, skip]);
     const listGraphQLOptions = useMemo<QueryHookOptions<GraphQLRoot<TEntity[]>>>(() => {
         return {
             ...options,
-            skip: skip || actualPageNo === undefined || pageCount === 0,
+            skip: skipList,
             variables: {
                 ...options?.variables,
                 [limitArgumentName]: pageSize,
                 [offsetArgumentName]: (actualPageNo! - 1) * pageSize
             }
         };
-    }, [skip, options, limitArgumentName, offsetArgumentName, pageSize, pageCount, actualPageNo]);
+    }, [skipList, options, limitArgumentName, offsetArgumentName, pageSize, actualPageNo]);
     const listResult = useQuery<GraphQLRoot<TEntity[]>>(
         listGraphQLNode,
         listGraphQLOptions
@@ -145,5 +152,18 @@ export function usePageQuery<TEntity = any>({
         };
     }, [countResult, listResult, rowCount, pageCount, list, skip, actualPageNo, pageSize]);
 }
+
+// When 
+//     1. skip is true
+//     2. use dynamic graphql(like this demo)
+// please use a this invalid query,
+// 
+// https://github.com/apollographql/apollo-feature-requests/issues/77
+const INVALID_QUERY: DocumentNode = 
+    gql`query {
+        __schema {
+            __typename
+        }
+    }`;
 
 export const DEFAULT_LIST_PAGE_SIZE = 5;

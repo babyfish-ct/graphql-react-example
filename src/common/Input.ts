@@ -13,7 +13,7 @@ export function useInputChange(setter: (
         } else {
             setter(trimedValue);
         }
-    }, [setter]);
+    }, [setter, trim]);
 }
 
 export function useCheckboxChange(

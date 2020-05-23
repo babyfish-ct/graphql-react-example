@@ -41,7 +41,7 @@ export const EditDialog: React.FC<{
             content: `Create department successfully, the id of new department is ${unwrapRoot(root)}`
         });
         form.resetFields();
-    }, []);
+    }, [form]);
     const onModified = useCallback((root: GraphQLRoot<boolean>) => {
         Modal.success({
             title: "Success",
@@ -53,7 +53,7 @@ export const EditDialog: React.FC<{
             title: "Error",
             content: `Failed to ${id === undefined ? 'create' : 'modify'} department`
         });
-    }, []);
+    }, [id]);
 
     const [create, {loading: creating}] = useMutation(
         CREATE_DOCUMENT_NODE,
@@ -80,7 +80,7 @@ export const EditDialog: React.FC<{
         }) !== undefined) {
             onClose(true);
         }
-    }, [id, create, modify,onClose]);
+    }, [id, form, create, modify,onClose]);
 
     const onCancel = useCallback(() => {
         onClose(false);

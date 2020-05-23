@@ -15,6 +15,8 @@ import Select from 'antd/es/select';
 import InputNumber from 'antd/es/input-number';
 import Button from 'antd/es/button';
 import { LoadingOutlined } from '@ant-design/icons';
+import { Selector as DepartmentSelector } from '../department/Selector';
+import { Selector as EmployeeSelector } from './Selector';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -45,7 +47,7 @@ export const EditDialog: React.FC<{
             content: `Create employee successfully, the id of new employee is ${unwrapRoot(root)}`
         });
         form.resetFields();
-    }, []);
+    }, [form]);
     const onModified = useCallback((root: GraphQLRoot<boolean>) => {
         Modal.success({
             title: "Success",
@@ -57,7 +59,7 @@ export const EditDialog: React.FC<{
             title: "Error",
             content: `Failed to ${id === undefined ? 'create' : 'modify'} employee`
         });
-    }, []);
+    }, [id]);
 
     const [create, {loading: creating}] = useMutation(
         CREATE_DOCUMENT_NODE,
@@ -79,12 +81,12 @@ export const EditDialog: React.FC<{
         if (await (id === undefined ? create : modify)({
             variables: {
                 id, 
-                name: form.getFieldsValue()['name'] 
+                input: form.getFieldsValue() 
             }
         }) !== undefined) {
             onClose(true);
         }
-    }, [id, create, modify,onClose]);
+    }, [id, form, create, modify,onClose]);
 
     const onCancel = useCallback(() => {
         onClose(false);
@@ -95,7 +97,8 @@ export const EditDialog: React.FC<{
         visible={visible}
         title={`${id === undefined ? 'Create' : 'Modify'} employee`}
         width={600}
-        footer={null}>
+        footer={null}
+        onCancel={onCancel}>
             {
                 new Case()
                 .when(
@@ -126,7 +129,8 @@ export const EditDialog: React.FC<{
                             <Select>
                                 <Select.Option value="MALE">Male</Select.Option>
                                 <Select.Option value="FEMALE">Female</Select.Option>
-                            </Select>
+                            </Select>,
+                            [{required: true, message: 'Gender is required'}]
                         )
                         .item(
                             'salary',
@@ -134,10 +138,23 @@ export const EditDialog: React.FC<{
                             <InputNumber min={100} max={100000}/>,
                             [{required: true, message: 'Salary is required'}]
                         )
+                        .item(
+                            'departmentId',
+                            'Department',
+                            <DepartmentSelector/>,
+                            [{required: true, message: 'Department is required'}]
+                        )
+                        .item(
+                            'supervisorId',
+                            'Supervisor',
+                            <EmployeeSelector/>
+                        )
                         .footer(
                             (invalid: boolean) => (
                                 <div style={{textAlign: 'right'}}>
-                                    <Button disabled={creating || modifying || invalid}>
+                                    <Button 
+                                    disabled={creating || modifying || invalid}
+                                    onClick={onSubmit}>
                                         {
                                             creating || modifying ? 
                                             <LoadingOutlined/> : 
@@ -156,12 +173,12 @@ export const EditDialog: React.FC<{
 };
 
 const CREATE_DOCUMENT_NODE: DocumentNode = 
-    gql`mutation($input: EmployeeeInput!) {
+    gql`mutation($input: EmployeeInput!) {
         createEmployee(input: $input)
     }`;
 
 const MODIFY_DOCUMENT_NODE: DocumentNode =
-    gql`mutation($id: Long!, $input: EmployeeeInput!) {
+    gql`mutation($id: Long!, $input: EmployeeInput!) {
         modifyEmployee(id: $id, input: $input)
     }`;
 

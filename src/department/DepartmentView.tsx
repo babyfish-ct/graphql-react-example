@@ -7,10 +7,10 @@ import { Employee } from '../model/Employee';
 import List from 'antd/es/list';
 import Card from 'antd/es/card';
 import { EmployeeView } from '../employee/EmployeeView';
-import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons';
 import Button from 'antd/es/button';
 import Popconfirm from 'antd/es/popconfirm';
-import { DocumentNode, valueFromAST } from 'graphql';
+import { DocumentNode } from 'graphql';
 import { gql } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
@@ -20,7 +20,7 @@ export const DepartmentView: React.FC<{
     depth?: number,
     onEditing?: (id: number) => void
     onDeleted?: (id: number) => void
-}> = ({department: value, depth = 1, onEditing, onDeleted}) => {
+}> = ({department, depth = 1, onEditing, onDeleted}) => {
 
     const renderEmployee = useCallback((employee: Employee, index: number): React.ReactNode => {
         return (
@@ -33,7 +33,7 @@ export const DepartmentView: React.FC<{
     const [delete_, { loading }] = useMutation(
         DELETE_DOCUMENT_NODE,
         {
-            variables: { id: value.id },
+            variables: { id: department.id },
             onCompleted: () => {
                 Modal.success({
                     title: "Departent has been deleted"
@@ -49,17 +49,17 @@ export const DepartmentView: React.FC<{
 
     const onEdit = useCallback(() => {
         if (onEditing !== undefined) {
-            onEditing(value.id ?? -1);
+            onEditing(department.id ?? -1);
         }
-    }, [value, onEditing]);
+    }, [department, onEditing]);
 
     const onConfirmDelete = useCallback(async () => {
         if (await delete_() !== undefined) {
             if (onDeleted !== undefined) {
-                onDeleted(value.id ?? -1);
+                onDeleted(department.id ?? -1);
             }
         }
-    }, [value, delete_, onDeleted]);
+    }, [department, delete_, onDeleted]);
 
     return (
         <div style={{flex: 1}}>
@@ -69,14 +69,14 @@ export const DepartmentView: React.FC<{
                         Department(Level-{depth})
                     </div>
                     {
-                        depth === 1 && value.id === undefined ?
+                        depth === 1 && department.id === undefined ?
                         <div style={{fontSize: 12, fontWeight: 'normal'}}>
                             Cannot edit/delete because there's no id
                         </div> :
                         undefined
                     }
                     {
-                        depth === 1 && value.id !== undefined?
+                        depth === 1 && department.id !== undefined?
                         <Button.Group>
                             <Button onClick={onEdit}>
                                 <EditOutlined />Edit
@@ -86,8 +86,13 @@ export const DepartmentView: React.FC<{
                             onConfirm={onConfirmDelete}
                             okText="Yes"
                             cancelText="No">
-                                <Button>
-                                    <DeleteOutlined/>Delete
+                                <Button disabled={loading}>
+                                    {
+                                        loading ?
+                                        <LoadingOutlined/> :
+                                        <DeleteOutlined/>
+                                    }
+                                    Delete
                                 </Button>
                             </Popconfirm>
                         </Button.Group> :
@@ -98,23 +103,23 @@ export const DepartmentView: React.FC<{
                 <div className={`object-view-${depth}`}>
                     <Row>
                         <Col span={LABEL_SPAN}>Id</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.id}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={department.id}/></Col>
                     </Row>
                     <Row>
                         <Col span={LABEL_SPAN}>Name</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.name}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={department.name}/></Col>
                     </Row>
                     <Row>
                         <Col span={LABEL_SPAN}>Average salary</Col>
-                        <Col span={VALUE_SPAN}><Value value={value.avgSalary}/></Col>
+                        <Col span={VALUE_SPAN}><Value value={department.avgSalary}/></Col>
                     </Row>
                     <Row>
-                        <Col span={hasValue(value.employees) ? 24 : LABEL_SPAN}>Employees</Col>
-                        <Col span={hasValue(value.employees) ? 24 : VALUE_SPAN}>
-                            <Value value={value.employees}>
+                        <Col span={hasValue(department.employees) ? 24 : LABEL_SPAN}>Employees</Col>
+                        <Col span={hasValue(department.employees) ? 24 : VALUE_SPAN}>
+                            <Value value={department.employees}>
                                 <div style={{paddingLeft: '2rem'}}>
                                     <List<Employee>
-                                    dataSource={value.employees}
+                                    dataSource={department.employees}
                                     renderItem={renderEmployee}/>
                                 </div>
                             </Value>
