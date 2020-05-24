@@ -1,12 +1,12 @@
-import { ReactElement } from 'react';
+import { ReactNode } from 'react';
 
 export class Case {
 
     private matched: boolean = false;
 
-    private result: ReactElement | null = null;
+    private result: ReactNode = null;
 
-    when(condition: boolean, node: ReactElement): this {
+    when(condition: boolean, node: ReactNode): this {
         if (!this.matched && condition) {
             this.matched = true;
             this.result = node;
@@ -14,7 +14,7 @@ export class Case {
         return this;
     }
 
-    otherwise(node: ReactElement): ReactElement | null {
+    otherwise(node: ReactNode): ReactNode {
         if (this.matched === false) {
             this.matched = true;
             this.result = node;

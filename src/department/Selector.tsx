@@ -65,35 +65,41 @@ export const Selector: React.FC<{
         return unwrapRoot(departmentRoot);
     }, [loading, error, departmentRoot, id]);
 
-    return new Case()
-    .when(
-        loading,
-        <Spin>Loading...</Spin>
-    )
-    .when(
-        error !== undefined,
-        <div>Load failed</div>
-    )
-    .otherwise(
-        <div style={{display: 'flex'}}>
-            <div style={{flex: 1}}>
-                <Input readOnly value={department?.name} onClick={onInputClick}/>
-            </div>
+    return (
+        <div>
             {
-                required ?
-                undefined :
-                <div>
-                    <Button onClick={onClearClick}>
-                        <ClearOutlined/>Clear
-                    </Button>
-                </div>
+                new Case()
+                .when(
+                    loading,
+                    <Spin>Loading...</Spin>
+                )
+                .when(
+                    error !== undefined,
+                    <div>Load failed</div>
+                )
+                .otherwise(
+                    <div style={{display: 'flex'}}>
+                        <div style={{flex: 1}}>
+                            <Input readOnly value={department?.name} onClick={onInputClick}/>
+                        </div>
+                        {
+                            required ?
+                            undefined :
+                            <div>
+                                <Button onClick={onClearClick} disabled={id === undefined}>
+                                    <ClearOutlined/>Clear
+                                </Button>
+                            </div>
+                        }
+                        <SelectDialog 
+                        visible={dialogVisible}
+                        id={value}
+                        onClose={onDialogClose}/>
+                    </div>
+                )
             }
-            <SelectDialog 
-            visible={dialogVisible}
-            id={value}
-            onClose={onDialogClose}/>
         </div>
-    )
+    );
 }
 
 const GET_BY_ID_DOCUMENT_NODE: DocumentNode = 

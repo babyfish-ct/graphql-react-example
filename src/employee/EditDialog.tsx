@@ -14,9 +14,10 @@ import Input from 'antd/es/input';
 import Select from 'antd/es/select';
 import InputNumber from 'antd/es/input-number';
 import Button from 'antd/es/button';
-import { LoadingOutlined } from '@ant-design/icons';
+import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Selector as DepartmentSelector } from '../department/Selector';
 import { Selector as EmployeeSelector } from './Selector';
+import { ApolloErrorView } from '../exception/ApolloErrorView';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -64,10 +65,9 @@ export const EditDialog: React.FC<{
     const onError = useCallback((error: ApolloError) => {
         Modal.error({
             title: "Error",
-            content: `Failed to ${id === undefined ? 'create' : 'modify'} employee`
+            content: <ApolloErrorView error={error}/>
         });
-        console.log(JSON.stringify(error));
-    }, [id]);
+    }, []);
 
     const [create, {loading: creating}] = useMutation(
         CREATE_DOCUMENT_NODE,
@@ -150,7 +150,7 @@ export const EditDialog: React.FC<{
                         .item(
                             'departmentId',
                             'Department',
-                            <DepartmentSelector/>,
+                            <DepartmentSelector required={true}/>,
                             [{required: true, message: 'Department is required'}]
                         )
                         .item(
@@ -168,7 +168,7 @@ export const EditDialog: React.FC<{
                                         {
                                             creating || modifying ? 
                                             <LoadingOutlined/> : 
-                                            undefined
+                                            <SaveOutlined/>
                                         }
                                         {
                                             id === undefined ? 'Create' : 'Modify' }

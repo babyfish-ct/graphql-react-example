@@ -11,10 +11,11 @@ import { EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons
 import Button from 'antd/es/button';
 import Popconfirm from 'antd/es/popconfirm';
 import { DocumentNode } from 'graphql';
-import { gql } from 'apollo-boost';
+import { gql, ApolloError } from 'apollo-boost';
 import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
 import { EditDialog } from './EditDialog';
+import { ApolloErrorView } from '../exception/ApolloErrorView';
 
 export const DepartmentView: React.FC<{
     department: Department,
@@ -47,12 +48,14 @@ export const DepartmentView: React.FC<{
             variables: { id: department.id },
             onCompleted: () => {
                 Modal.success({
-                    title: "Departent has been deleted"
+                    title: "Success",
+                    content: "Departent has been deleted"
                 });
             },
-            onError: () => {
+            onError: (error: ApolloError) => {
                 Modal.error({
-                    content: "Failed to delete the department"
+                    title: "Error",
+                    content: <ApolloErrorView error={error}/>
                 });
             }
         }

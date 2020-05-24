@@ -12,8 +12,9 @@ import { EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons
 import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
 import { DocumentNode } from 'graphql';
-import { gql } from 'apollo-boost';
+import { gql, ApolloError } from 'apollo-boost';
 import { EditDialog } from '../employee/EditDialog';
+import { ApolloErrorView } from '../exception/ApolloErrorView';
 
 export const EmployeeView: React.FC<{
     employee: Employee,
@@ -46,12 +47,14 @@ export const EmployeeView: React.FC<{
             variables: { id: employee.id },
             onCompleted: () => {
                 Modal.success({
-                    title: "Employee has been deleted"
+                    title: "Success",
+                    content: "Employee has been deleted"
                 });
             },
-            onError: () => {
+            onError: (error: ApolloError) => {
                 Modal.error({
-                    content: "Failed to delete the employee"
+                    title: "Error",
+                    content: <ApolloErrorView error={error}/>
                 });
             }
         }

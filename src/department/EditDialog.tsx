@@ -5,11 +5,12 @@ import { useMutation, useQuery } from '@apollo/react-hooks';
 import { gql, DocumentNode, ApolloError } from 'apollo-boost';
 import { TypedFrom, FormDefination } from '../common/TypedForm';
 import Button from 'antd/es/button';
-import { LoadingOutlined } from '@ant-design/icons';
+import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/util';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { Department } from '../model/Department';
 import { Case } from '../common/Case';
+import { ApolloErrorView } from '../exception/ApolloErrorView';
 import Spin from 'antd/es/spin';
 
 export const EditDialog: React.FC<{
@@ -51,9 +52,10 @@ export const EditDialog: React.FC<{
     const onError = useCallback((error: ApolloError) => {
         Modal.error({
             title: "Error",
-            content: `Failed to ${id === undefined ? 'create' : 'modify'} department`
+            content: <ApolloErrorView error={error}/>
         });
-    }, [id]);
+        console.log(error);
+    }, []);
 
     const [create, {loading: creating}] = useMutation(
         CREATE_DOCUMENT_NODE,
@@ -124,7 +126,7 @@ export const EditDialog: React.FC<{
                                     { 
                                         creating || modifying ? 
                                         <LoadingOutlined/> : 
-                                        undefined 
+                                        <SaveOutlined/> 
                                     }
                                     { id === undefined ? 'Create' : 'Modify'}
                                 </Button>

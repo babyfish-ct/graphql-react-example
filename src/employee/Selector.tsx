@@ -64,33 +64,39 @@ export const Selector: React.FC<{
         return unwrapRoot(employeeRoot);
     }, [loading, error, employeeRoot, id]);
 
-    return new Case()
-    .when(
-        loading,
-        <Spin>Loading...</Spin>
-    )
-    .when(
-        error !== undefined,
-        <div>Load failed</div>
-    )
-    .otherwise(
-        <div style={{display: 'flex'}}>
-            <div style={{flex: 1}}>
-                <Input readOnly value={employee?.name} onClick={onInputClick}/>
-            </div>
+    return (
+        <div>
             {
-                required ?
-                undefined : 
-                <div>
-                    <Button onClick={onClearClick}>
-                        <ClearOutlined />Clear
-                    </Button>
-                </div>
+                new Case()
+                .when(
+                    loading,
+                    <Spin>Loading...</Spin>
+                )
+                .when(
+                    error !== undefined,
+                    <div>Load failed</div>
+                )
+                .otherwise(
+                    <div style={{display: 'flex'}}>
+                        <div style={{flex: 1}}>
+                            <Input readOnly value={employee?.name} onClick={onInputClick}/>
+                        </div>
+                        {
+                            required ?
+                            undefined : 
+                            <div>
+                                <Button onClick={onClearClick} disabled={id === undefined}>
+                                    <ClearOutlined />Clear
+                                </Button>
+                            </div>
+                        }
+                        <SelectDialog 
+                        visible={dialogVisible}
+                        id={value}
+                        onClose={onDialogClose}/>
+                    </div>
+                )
             }
-            <SelectDialog 
-            visible={dialogVisible}
-            id={value}
-            onClose={onDialogClose}/>
         </div>
     )
 }
