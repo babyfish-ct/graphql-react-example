@@ -1,9 +1,6 @@
 # Get and start server side
 
-1. Download or git clone the GraphQL server project: https://github.com/babyfish-ct/graphql-kotlin-example.
-2. Open command window
-3. **cd** to the local directory of server project
-4. execute the command **mvn spring-boot:run**
+Please see https://github.com/babyfish-ct/graphql-kotlin-example to know more
 
 # Get and start client side
 
