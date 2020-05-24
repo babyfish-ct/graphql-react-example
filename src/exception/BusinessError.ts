@@ -16,21 +16,21 @@ export interface IllegalSupervisorError {
 }
 
 export interface CannotDeleteDepartmentWithEmployeesError {
-    code: 'CANNOT_DELETE_DEPARTMENT_WITH_EMPLOYEES';
-    departmentId: number;
-    employees: NamedEntity[]
+    readonly code: 'CANNOT_DELETE_DEPARTMENT_WITH_EMPLOYEES';
+    readonly departmentId: number;
+    readonly employees: NamedEntity[]
 }
 
 export interface CannotDeleteEmployeeWithSubordinatesError {
-    code: 'CANNOT_DELETE_EMPLOYEE_WITH_SUBORDINATES';
-    employeeId: number;
-    subordinates: NamedEntity[]
+    readonly code: 'CANNOT_DELETE_EMPLOYEE_WITH_SUBORDINATES';
+    readonly employeeId: number;
+    readonly subordinates: NamedEntity[]
 }
 
 export interface SupervisorCycleError {
-    code: 'SUPERVISOR_CYCLE',
-    employeeId: number;
-    supervisors: NamedEntity[]
+    readonly code: 'SUPERVISOR_CYCLE',
+    readonly employeeId: number;
+    readonly supervisors: NamedEntity[]
 }
 
 export interface NamedEntity<TID = number> {
