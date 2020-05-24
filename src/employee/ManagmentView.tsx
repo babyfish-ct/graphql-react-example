@@ -132,7 +132,7 @@ export const ManagementView: React.FC = () => {
                         )
                         .when(
                             error !== undefined,
-                            <div>加载数据失败</div>
+                            <div>Load data failed!</div>
                         )
                         .otherwise(
                             <List<Employee>
