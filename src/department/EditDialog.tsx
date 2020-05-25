@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect } from 'react';
 import Modal from 'antd/es/modal';
 import Input from 'antd/es/input';
-import { useMutation } from '@apollo/react-hooks';
-import { gql, DocumentNode, ApolloError } from 'apollo-boost';
 import { TypedFrom, FormDefination } from '../common/TypedForm';
 import Button from 'antd/es/button';
 import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
@@ -10,9 +8,10 @@ import { useForm } from 'antd/es/form/util';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { Department } from '../model/Department';
 import { Case } from '../common/Case';
-import { ApolloErrorView } from '../exception/ApolloErrorView';
+import { APIErrorView } from '../exception/APIErrorView';
 import Spin from 'antd/es/spin';
-import { useNewQuery } from '../common/Query';
+import { useSkipQuery } from '../common/SkipQueryHooks';
+import { useMutation } from 'graphql-hooks';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -22,8 +21,12 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const { loading, error, data: departmentRoot } = useNewQuery<GraphQLRoot<Department>>(
-        GET_BY_ID_DOCUMENT_NODE,
+    const { loading, error, data: departmentRoot } = useSkipQuery<GraphQLRoot<Department>>(
+        `query($id: Long!) {
+            department(id: $id) {
+                name
+            }
+        }`,
         {
             skip: id === undefined,
             variables: { id }
@@ -37,51 +40,48 @@ export const EditDialog: React.FC<{
         }
     }, [loading, error, departmentRoot, form]);
 
-    const onCreated = useCallback((root: GraphQLRoot<number>) => {
-        Modal.success({
-            title: "Success",
-            content: `Create department successfully, the id of new department is ${unwrapRoot(root)}`
-        });
-        form.resetFields();
-    }, [form]);
-    const onModified = useCallback((root: GraphQLRoot<boolean>) => {
-        Modal.success({
-            title: "Success",
-            content: `Modify department successfully`
-        });
-    }, []);
-    const onError = useCallback((error: ApolloError) => {
-        Modal.error({
-            title: "Error",
-            content: <ApolloErrorView error={error}/>
-        });
-    }, []);
-
     const [create, {loading: creating}] = useMutation(
-        CREATE_DOCUMENT_NODE,
-        {
-            onCompleted: onCreated,
-            onError
-        }
+        `mutation($name: String!) {
+            createDepartment(name: $name)
+        }`
     );
 
     const [modify, {loading: modifying}] = useMutation(
-        MODIFY_DOCUMENT_NODE,
-        {
-            onCompleted: onModified,
-            onError
-        }
+        `mutation($id: Long!, $name: String!) {
+            modifyDepartment(id: $id, name: $name)
+        }`
     );
 
     const onSubmit = useCallback(async () => {
         await form.validateFields();
-        if (await (id === undefined ? create : modify)({
+        const { error, data } = await (id === undefined ? create : modify)({
             variables: {
                 id, 
                 name: form.getFieldsValue()['name'] 
             }
-        }) !== undefined) {
-            onClose(true);
+        });
+        if (error !== undefined) {
+            Modal.error({
+                title: "Error",
+                content: <APIErrorView error={error}/>
+            });
+        } else {
+            if (id === undefined) {
+                Modal.success({
+                    title: "Success",
+                    content: 'Create department successfully, ' +
+                    `the id of new department is ${unwrapRoot(data)}`
+                });
+                form.resetFields();
+            } else {
+                Modal.success({
+                    title: "Success",
+                    content: `Modify department successfully`
+                });
+            }
+            if (onClose !== undefined) {
+                onClose(true);
+            }
         }
     }, [id, form, create, modify,onClose]);
 
@@ -143,20 +143,3 @@ export const EditDialog: React.FC<{
         </Modal>
     );
 };
-
-const CREATE_DOCUMENT_NODE: DocumentNode = 
-    gql`mutation($name: String!) {
-        createDepartment(name: $name)
-    }`;
-
-const MODIFY_DOCUMENT_NODE: DocumentNode =
-    gql`mutation($id: Long!, $name: String!) {
-        modifyDepartment(id: $id, name: $name)
-    }`;
-
-const GET_BY_ID_DOCUMENT_NODE: DocumentNode = 
-    gql`query($id: Long!) {
-        department(id: $id) {
-            name
-        }
-    }`;

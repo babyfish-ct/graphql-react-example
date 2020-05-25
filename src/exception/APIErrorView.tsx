@@ -1,18 +1,18 @@
 import React, { useMemo } from 'react';
-import { ApolloError } from 'apollo-boost';
+import { APIError } from 'graphql-hooks';
 import { BusinessError, CannotDeleteDepartmentWithEmployeesError, NamedEntity, CannotDeleteEmployeeWithSubordinatesError, SupervisorCycleError } from './BusinessError';
 import { Case } from '../common/Case';
 import Table from 'antd/es/table';
 
-export const ApolloErrorView: React.FC<{
-    error: ApolloError
+export const APIErrorView: React.FC<{
+    error: APIError<object>
 }> = ({error}) => {
 
     const businessError = useMemo<BusinessError | undefined>(() => {    
-        if (error.networkError !== null && error.networkError !== undefined) {
+        if (error.httpError !== undefined || error.fetchError !== undefined) {
             return undefined;
         }
-        for (const graphQLError of error.graphQLErrors) {
+        for (const graphQLError of error.graphQLErrors ?? []) {
 
             // Why does not GraphQLError declare the field 'errorType'?
             const errorType = (graphQLError as any)["errorType"] as string | undefined;
@@ -20,7 +20,7 @@ export const ApolloErrorView: React.FC<{
             if (errorType !== undefined && errorType.startsWith(PREFIX)) {
                 return {
                     code: errorType.substring(PREFIX.length),
-                    ...graphQLError.extensions
+                    ...(graphQLError as any)["extensions"]
                 } as any as BusinessError;
             }
         }
@@ -32,7 +32,7 @@ export const ApolloErrorView: React.FC<{
             {
                 new Case()
                 .when(
-                    error.networkError !== null && error.networkError !== undefined,
+                    error.httpError !== undefined || error.fetchError !== undefined,
                     <div>Network error</div>
                 )
                 .when(
@@ -66,7 +66,9 @@ export const ApolloErrorView: React.FC<{
                     )
                 )
                 .otherwise(
-                    <div>{error.message}</div>
+                    <div>
+                        {error.fetchError?.message ?? 'Unknown error'}
+                    </div>
                 )
             }
         </div>

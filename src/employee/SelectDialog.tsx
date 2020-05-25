@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useCallback, HTMLAttributes } from 'react';
 import Modal from 'antd/es/modal';
 import Table, { TablePaginationConfig } from 'antd/es/table';
-import { usePageQuery, DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
+import { DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
 import { Employee } from '../model/Employee';
 import { Case } from '../common/Case';
 import Spin from 'antd/es/spin';
@@ -9,6 +9,7 @@ import Form from 'antd/es/form';
 import Input from 'antd/es/input';
 import { useInputChange } from '../common/Input';
 import { TableRowSelection, Key } from 'antd/es/table/interface';
+import { usePageQuery } from '../common/PageQueryHooks';
 
 export const SelectDialog: React.FC<{
     visible: boolean,

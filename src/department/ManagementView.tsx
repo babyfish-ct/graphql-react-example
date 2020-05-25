@@ -1,7 +1,7 @@
 import React, { useState, useCallback, ReactNode, useMemo, useEffect } from 'react';
 import { SpecificationView } from './SpecificationView';
 import { DepartmentSpecification, DEFAULT_DEPARTMENT_SPECIFICATION } from '../model/DepartmentSpecification';
-import { usePageQuery, DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
+import { DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
 import { createDynamicGraphQLBody } from '../model/dynamic/GraphQLDynamicBody';
 import { Case } from '../common/Case';
 import List from 'antd/es/list';
@@ -13,6 +13,7 @@ import Layout from 'antd/es/layout';
 import Button from 'antd/es/button';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import { EditDialog } from './EditDialog';
+import { usePageQuery } from '../common/PageQueryHooks';
 
 export const ManagementView: React.FC = () => {
 

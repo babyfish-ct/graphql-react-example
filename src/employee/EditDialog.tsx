@@ -1,7 +1,4 @@
 import React, { useEffect, useCallback } from 'react';
-import { DocumentNode } from 'graphql';
-import { gql, ApolloError } from 'apollo-boost';
-import { useMutation } from '@apollo/react-hooks';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { useForm } from 'antd/es/form/util';
 import { Employee } from '../model/Employee';
@@ -17,8 +14,9 @@ import Button from 'antd/es/button';
 import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Selector as DepartmentSelector } from '../department/Selector';
 import { Selector as EmployeeSelector } from './Selector';
-import { ApolloErrorView } from '../exception/ApolloErrorView';
-import { useNewQuery } from '../common/Query';
+import { APIErrorView } from '../exception/APIErrorView';
+import { useSkipQuery } from '../common/SkipQueryHooks';
+import { useMutation } from 'graphql-hooks';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -28,8 +26,20 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const { loading, error, data: employeeRoot } = useNewQuery<GraphQLRoot<Employee>>(
-        GET_BY_ID_DOCUMENT_NODE,
+    const { loading, error, data: employeeRoot } = useSkipQuery<GraphQLRoot<Employee>>(
+        `query($id: Long!) {
+            employee(id: $id) {
+                name
+                gender
+                salary
+                department {
+                    id
+                }
+                supervisor {
+                    id
+                }
+            }
+        }`,
         {
             skip: id === undefined,
             variables: { id }
@@ -51,50 +61,45 @@ export const EditDialog: React.FC<{
         }
     }, [loading, error, employeeRoot, form]);
 
-    const onCreated = useCallback((root: GraphQLRoot<number>) => {
-        Modal.success({
-            title: "Success",
-            content: `Create employee successfully, the id of new employee is ${unwrapRoot(root)}`
-        });
-        form.resetFields();
-    }, [form]);
-    const onModified = useCallback((root: GraphQLRoot<boolean>) => {
-        Modal.success({
-            title: "Success",
-            content: `Modify employee successfully`
-        });
-    }, []);
-    const onError = useCallback((error: ApolloError) => {
-        Modal.error({
-            title: "Error",
-            content: <ApolloErrorView error={error}/>
-        });
-    }, []);
-
     const [create, {loading: creating}] = useMutation(
-        CREATE_DOCUMENT_NODE,
-        {
-            onCompleted: onCreated,
-            onError
-        }
+        `mutation($input: EmployeeInput!) {
+            createEmployee(input: $input)
+        }`,
     );
 
     const [modify, {loading: modifying}] = useMutation(
-        MODIFY_DOCUMENT_NODE,
-        {
-            onCompleted: onModified,
-            onError
-        }
+        `mutation($id: Long!, $input: EmployeeInput!) {
+            modifyEmployee(id: $id, input: $input)
+        }`,
     );
 
     const onSubmit = useCallback(async () => {
         await form.validateFields();
-        if (await (id === undefined ? create : modify)({
+        const {error, data} = await (id === undefined ? create : modify)({
             variables: {
                 id, 
                 input: form.getFieldsValue() 
             }
-        }) !== undefined) {
+        });
+        if (error !== undefined) {
+            Modal.error({
+                title: "Error",
+                content: <APIErrorView error={error}/>
+            });
+        } else {
+            if (id === undefined) {
+                Modal.success({
+                    title: "Success",
+                    content: 'Create employee successfully, ' + 
+                    `the id of new employee is ${unwrapRoot(data)}`
+                });
+                form.resetFields();
+            } else {
+                Modal.success({
+                    title: "Success",
+                    content: `Modify employee successfully`
+                });
+            }
             onClose(true);
         }
     }, [id, form, create, modify,onClose]);
@@ -184,28 +189,3 @@ export const EditDialog: React.FC<{
         </Modal>
     );
 };
-
-const CREATE_DOCUMENT_NODE: DocumentNode = 
-    gql`mutation($input: EmployeeInput!) {
-        createEmployee(input: $input)
-    }`;
-
-const MODIFY_DOCUMENT_NODE: DocumentNode =
-    gql`mutation($id: Long!, $input: EmployeeInput!) {
-        modifyEmployee(id: $id, input: $input)
-    }`;
-
-const GET_BY_ID_DOCUMENT_NODE: DocumentNode = 
-    gql`query($id: Long!) {
-        employee(id: $id) {
-            name
-            gender
-            salary
-            department {
-                id
-            }
-            supervisor {
-                id
-            }
-        }
-    }`;

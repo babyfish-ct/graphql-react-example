@@ -2,7 +2,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { SpecificationView } from './SpecificationView';
 import Layout from 'antd/es/layout';
 import { EmployeeSpecification, DEFAULT_EMPLOYEE_SPECIFICATION } from '../model/EmployeeSpecification';
-import { usePageQuery, DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
+import { DEFAULT_LIST_PAGE_SIZE } from '../common/Page';
 import { createDynamicGraphQLBody } from '../model/dynamic/GraphQLDynamicBody';
 import { Employee } from '../model/Employee';
 import { Case } from '../common/Case';
@@ -13,6 +13,7 @@ import { PaginationConfig } from 'antd/es/pagination';
 import { PlusCircleOutlined } from '@ant-design/icons';
 import Button from 'antd/es/button';
 import { EditDialog } from '../employee/EditDialog';
+import { usePageQuery } from '../common/PageQueryHooks';
 
 export const ManagementView: React.FC = () => {
 

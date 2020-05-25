@@ -10,12 +10,10 @@ import { EmployeeView } from '../employee/EmployeeView';
 import { EditOutlined, DeleteOutlined, LoadingOutlined } from '@ant-design/icons';
 import Button from 'antd/es/button';
 import Popconfirm from 'antd/es/popconfirm';
-import { DocumentNode } from 'graphql';
-import { gql, ApolloError } from 'apollo-boost';
-import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
 import { EditDialog } from './EditDialog';
-import { ApolloErrorView } from '../exception/ApolloErrorView';
+import { APIErrorView } from '../exception/APIErrorView';
+import { useMutation } from 'graphql-hooks';
 
 export const DepartmentView: React.FC<{
     department: Department,
@@ -43,21 +41,11 @@ export const DepartmentView: React.FC<{
     }, [depth]);
 
     const [delete_, { loading }] = useMutation(
-        DELETE_DOCUMENT_NODE,
+        `mutation($id: Long!) {
+            deleteDepartment(id: $id)
+        }`,
         {
-            variables: { id: department.id },
-            onCompleted: () => {
-                Modal.success({
-                    title: "Success",
-                    content: "Departent has been deleted"
-                });
-            },
-            onError: (error: ApolloError) => {
-                Modal.error({
-                    title: "Error",
-                    content: <ApolloErrorView error={error}/>
-                });
-            }
+            variables: { id: department.id }
         }
     );
 
@@ -72,9 +60,19 @@ export const DepartmentView: React.FC<{
     }, [onEdit, department]);
 
     const onConfirmDelete = useCallback(async () => {
-        if (await delete_() !== undefined) {
+        const {error} = await delete_()
+        if (error !== undefined) {
+            Modal.error({
+                title: "Error",
+                content: <APIErrorView error={error}/>
+            });
+        } else {
+            Modal.success({
+                title: "Success",
+                content: "Departent has been deleted"
+            });
             if (onDelete !== undefined) {
-                onDelete(department.id ?? -1);
+                onDelete(department.id!);
             }
         }
     }, [department, delete_, onDelete]);
@@ -168,8 +166,3 @@ export const DepartmentView: React.FC<{
 
 const LABEL_SPAN = 8;
 const VALUE_SPAN = 24 - LABEL_SPAN;
-
-const DELETE_DOCUMENT_NODE: DocumentNode = 
-    gql`mutation($id: Long!) {
-        deleteDepartment(id: $id)
-    }`;

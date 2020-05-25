@@ -3,13 +3,11 @@ import { Department } from '../model/Department';
 import Input from 'antd/es/input';
 import Button from 'antd/es/button';
 import { SelectDialog } from './SelectDialog';
-import { DocumentNode } from 'graphql';
-import { gql } from 'apollo-boost';
-import { useQuery } from '@apollo/react-hooks';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { Case } from '../common/Case';
 import Spin from 'antd/es/spin';
 import { ClearOutlined } from '@ant-design/icons';
+import { useSkipQuery } from '../common/SkipQueryHooks';
 
 /**
  * The form of ANTD support custom form control
@@ -50,8 +48,13 @@ export const Selector: React.FC<{
         }
     }, [onChange]);
 
-    const {loading, error, data: departmentRoot} = useQuery<GraphQLRoot<Department>>(
-        GET_BY_ID_DOCUMENT_NODE,
+    const {loading, error, data: departmentRoot} = useSkipQuery<GraphQLRoot<Department>>(
+        `query($id: Long!) {
+            department(id: $id) {
+                id
+                name
+            }
+        }`,
         {
             skip: id === undefined,
             variables: { id }
@@ -101,11 +104,3 @@ export const Selector: React.FC<{
         </div>
     );
 }
-
-const GET_BY_ID_DOCUMENT_NODE: DocumentNode = 
-    gql`query($id: Long!) {
-        department(id: $id) {
-            id
-            name
-        }
-    }`;

@@ -9,12 +9,10 @@ import Card from 'antd/es/card';
 import Button from 'antd/es/button';
 import Popconfirm from 'antd/es/popconfirm';
 import { EditOutlined, LoadingOutlined, DeleteOutlined } from '@ant-design/icons';
-import { useMutation } from '@apollo/react-hooks';
 import Modal from 'antd/es/modal';
-import { DocumentNode } from 'graphql';
-import { gql, ApolloError } from 'apollo-boost';
 import { EditDialog } from '../employee/EditDialog';
-import { ApolloErrorView } from '../exception/ApolloErrorView';
+import { APIErrorView } from '../exception/APIErrorView';
+import { useMutation } from 'graphql-hooks';
 
 export const EmployeeView: React.FC<{
     employee: Employee,
@@ -42,21 +40,11 @@ export const EmployeeView: React.FC<{
     }, [depth]);
 
     const [delete_, { loading }] = useMutation(
-        DELETE_DOCUMENT_NODE,
+        `mutation($id: Long!) {
+            deleteEmployee(id: $id)
+        }`,
         {
-            variables: { id: employee.id },
-            onCompleted: () => {
-                Modal.success({
-                    title: "Success",
-                    content: "Employee has been deleted"
-                });
-            },
-            onError: (error: ApolloError) => {
-                Modal.error({
-                    title: "Error",
-                    content: <ApolloErrorView error={error}/>
-                });
-            }
+            variables: { id: employee.id }
         }
     );
 
@@ -71,9 +59,19 @@ export const EmployeeView: React.FC<{
     }, [onEdit, employee]);
 
     const onConfirmDelete = useCallback(async () => {
-        if (await delete_() !== undefined) {
+        const {error} = await delete_();
+        if (error !== undefined) {
+            Modal.error({
+                title: "Error",
+                content: <APIErrorView error={error}/>
+            });
+        } else {
+            Modal.success({
+                title: "Success",
+                content: "Employee has been deleted"
+            });
             if (onDelete !== undefined) {
-                onDelete(employee.id ?? -1);
+                onDelete(employee.id!);
             }
         }
     }, [employee, delete_, onDelete]);
@@ -191,8 +189,3 @@ export const EmployeeView: React.FC<{
 
 const LABEL_SPAN = 8;
 const VALUE_SPAN = 24 - LABEL_SPAN;
-
-const DELETE_DOCUMENT_NODE: DocumentNode = 
-    gql`mutation($id: Long!) {
-        deleteEmployee(id: $id)
-    }`;
