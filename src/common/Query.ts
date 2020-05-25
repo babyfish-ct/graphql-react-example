@@ -4,7 +4,8 @@ import { QueryResult } from '@apollo/react-common';
 import { useEffect } from 'react';
 
 /**
- * Make sure the query can get the newest data 
+ * Make sure the query can get the newest data from server side
+ * even if the graphql and variables have not been changed
  */
 export function useNewQuery<TData = any, TVariables = OperationVariables>(
     query: DocumentNode, 
