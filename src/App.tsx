@@ -18,7 +18,7 @@ function createApolloClient(): ApolloClient<any> {
     });
     client.defaultOptions = {
         query: {
-            fetchPolicy: "no-cache"
+            fetchPolicy: "network-only"
         }  
     };
     return client;

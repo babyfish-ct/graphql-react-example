@@ -27,13 +27,19 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const { loading, error, data: employeeRoot } = useQuery<GraphQLRoot<Employee>>(
+    const { loading, error, data: employeeRoot, refetch } = useQuery<GraphQLRoot<Employee>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
             skip: id === undefined,
             variables: { id }
         }
     );
+    // useEffect(() => {
+    //     if (id !== undefined) {
+    //         refetch();
+    //     }
+    // }, [id, refetch]);
+    console.log(JSON.stringify(employeeRoot));
     useEffect(() => {
         if (!loading && error === undefined && employeeRoot !== undefined) {
             const employee = unwrapRoot(employeeRoot);
