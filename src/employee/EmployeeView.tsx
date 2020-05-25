@@ -65,7 +65,7 @@ export const EmployeeView: React.FC<{
     }, []);
     const onDialogClose = useCallback((saved: boolean) => {
         setDialog(false);
-        if (onEdit !== undefined) {
+        if (saved && onEdit !== undefined) {
             onEdit(employee.id!);
         }
     }, [onEdit, employee]);

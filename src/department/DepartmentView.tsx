@@ -66,7 +66,7 @@ export const DepartmentView: React.FC<{
     }, []);
     const onDialogClose = useCallback((saved: boolean) => {
         setDialog(false);
-        if (onEdit !== undefined) {
+        if (saved && onEdit !== undefined) {
             onEdit(department.id!);
         }
     }, [onEdit, department]);
