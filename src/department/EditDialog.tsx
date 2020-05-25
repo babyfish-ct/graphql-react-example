@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import Modal from 'antd/es/modal';
 import Input from 'antd/es/input';
-import { useMutation, useQuery } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { gql, DocumentNode, ApolloError } from 'apollo-boost';
 import { TypedFrom, FormDefination } from '../common/TypedForm';
 import Button from 'antd/es/button';
@@ -12,6 +12,7 @@ import { Department } from '../model/Department';
 import { Case } from '../common/Case';
 import { ApolloErrorView } from '../exception/ApolloErrorView';
 import Spin from 'antd/es/spin';
+import { useNewQuery } from '../common/Query';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -21,7 +22,7 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const { loading, error, data: departmentRoot } = useQuery<GraphQLRoot<Department>>(
+    const { loading, error, data: departmentRoot } = useNewQuery<GraphQLRoot<Department>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
             skip: id === undefined,
@@ -54,7 +55,6 @@ export const EditDialog: React.FC<{
             title: "Error",
             content: <ApolloErrorView error={error}/>
         });
-        console.log(error);
     }, []);
 
     const [create, {loading: creating}] = useMutation(

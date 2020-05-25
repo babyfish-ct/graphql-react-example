@@ -1,7 +1,7 @@
 import React, { useEffect, useCallback } from 'react';
 import { DocumentNode } from 'graphql';
 import { gql, ApolloError } from 'apollo-boost';
-import { useQuery, useMutation } from '@apollo/react-hooks';
+import { useMutation } from '@apollo/react-hooks';
 import { GraphQLRoot, unwrapRoot } from '../model/graphql/GraphQLRoot';
 import { useForm } from 'antd/es/form/util';
 import { Employee } from '../model/Employee';
@@ -18,6 +18,7 @@ import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
 import { Selector as DepartmentSelector } from '../department/Selector';
 import { Selector as EmployeeSelector } from './Selector';
 import { ApolloErrorView } from '../exception/ApolloErrorView';
+import { useNewQuery } from '../common/Query';
 
 export const EditDialog: React.FC<{
     visible: boolean,
@@ -27,19 +28,14 @@ export const EditDialog: React.FC<{
 
     const [form] = useForm();
 
-    const { loading, error, data: employeeRoot, refetch } = useQuery<GraphQLRoot<Employee>>(
+    const { loading, error, data: employeeRoot } = useNewQuery<GraphQLRoot<Employee>>(
         GET_BY_ID_DOCUMENT_NODE,
         {
             skip: id === undefined,
             variables: { id }
         }
     );
-    // useEffect(() => {
-    //     if (id !== undefined) {
-    //         refetch();
-    //     }
-    // }, [id, refetch]);
-    console.log(JSON.stringify(employeeRoot));
+
     useEffect(() => {
         if (!loading && error === undefined && employeeRoot !== undefined) {
             const employee = unwrapRoot(employeeRoot);
