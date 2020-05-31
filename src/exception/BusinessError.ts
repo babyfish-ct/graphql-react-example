@@ -1,9 +1,25 @@
 export type BusinessError = 
+IllegalLoginNameError |
+IllegalPasswordError |
+UnauthorizedError |
 IllegalDepartmentError |
 IllegalSupervisorError |
 CannotDeleteDepartmentWithEmployeesError |
 CannotDeleteEmployeeWithSubordinatesError |
 SupervisorCycleError;
+
+export interface IllegalLoginNameError {
+    readonly code: 'ILLEGAL_LOGIN_NAME';
+    readonly loginName: string;
+}
+
+export interface IllegalPasswordError {
+    readonly code: 'ILLEGAL_PASSWORD';
+}
+
+export interface UnauthorizedError {
+    readonly code: 'UNAUTHORIZED';
+}
 
 export interface IllegalDepartmentError {
     readonly code: 'ILLEGAL_DEPARTMENT_ID';

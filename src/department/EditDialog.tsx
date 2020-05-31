@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect } from 'react';
 import Modal from 'antd/es/modal';
 import Input from 'antd/es/input';
-import { TypedFrom, FormDefination } from '../common/TypedForm';
+import { TypedForm, FormDefination } from '../common/TypedForm';
 import Button from 'antd/es/button';
 import { SaveOutlined, LoadingOutlined } from '@ant-design/icons';
 import { useForm } from 'antd/es/form/util';
@@ -107,7 +107,7 @@ export const EditDialog: React.FC<{
                 <div>Load failed</div>
             )
             .otherwise(
-                <TypedFrom<{name: string}>
+                <TypedForm<{name: string}>
                 defination={
                     new FormDefination<{name: string}>()
                     .item(

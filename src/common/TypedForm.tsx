@@ -28,7 +28,7 @@ export interface TypedFromProps<T> extends Omit<FormProps, 'children'> {
     defination: FormDefination<T>
 }
 
-export function TypedFrom<T>({defination, ...formProps}: TypedFromProps<T>): JSX.Element {
+export function TypedForm<T>({defination, ...formProps}: TypedFromProps<T>): JSX.Element {
     const { footerCreator } = defination;
     const { form } = formProps;
 

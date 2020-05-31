@@ -5,7 +5,7 @@ import { Employee } from '../model/Employee';
 import Modal from 'antd/es/modal';
 import { Case } from '../common/Case';
 import Spin from 'antd/es/spin';
-import { TypedFrom, FormDefination } from '../common/TypedForm';
+import { TypedForm, FormDefination } from '../common/TypedForm';
 import { EmployeeInput } from '../model/EmployeeInput';
 import Input from 'antd/es/input';
 import Select from 'antd/es/select';
@@ -126,7 +126,7 @@ export const EditDialog: React.FC<{
                     <div>Load failed</div>
                 )
                 .otherwise(
-                    <TypedFrom<EmployeeInput>
+                    <TypedForm<EmployeeInput>
                     form={form}
                     layout="horizontal"
                     labelCol={{span: 8}}

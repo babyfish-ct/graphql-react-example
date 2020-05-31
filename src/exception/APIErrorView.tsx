@@ -17,9 +17,9 @@ export const APIErrorView: React.FC<{
             // Why does not GraphQLError declare the field 'errorType'?
             const errorType = (graphQLError as any)["errorType"] as string | undefined;
 
-            if (errorType !== undefined && errorType.startsWith(PREFIX)) {
+            if (errorType !== undefined && errorType.startsWith(BUSINESS_PREFIX)) {
                 return {
-                    code: errorType.substring(PREFIX.length),
+                    code: errorType.substring(BUSINESS_PREFIX.length),
                     ...(graphQLError as any)["extensions"]
                 } as any as BusinessError;
             }
@@ -39,30 +39,42 @@ export const APIErrorView: React.FC<{
                     businessError !== undefined,
                     new Case()
                     .when(
-                        businessError!.code === 'ILLEGAL_DEPARTMENT_ID',
+                        businessError?.code === 'ILLEGAL_LOGIN_NAME',
+                        <div>The login name is illegal</div>
+                    )
+                    .when(
+                        businessError?.code === 'ILLEGAL_PASSWORD',
+                        <div>The password is illegal</div>
+                    )
+                    .when(
+                        businessError?.code === 'UNAUTHORIZED',
+                        <div>Unauthorized, please login</div>
+                    )
+                    .when(
+                        businessError?.code === 'ILLEGAL_DEPARTMENT_ID',
                         <div>The specified department dependency is illegal</div>
                     )
                     .when(
-                        businessError!.code === 'ILLEGAL_SUPERVISOR_ID',
+                        businessError?.code === 'ILLEGAL_SUPERVISOR_ID',
                         <div>The specified department dependency is illegal</div>
                     )
                     .when(
-                        businessError!.code === 'CANNOT_DELETE_DEPARTMENT_WITH_EMPLOYEES',
+                        businessError?.code === 'CANNOT_DELETE_DEPARTMENT_WITH_EMPLOYEES',
                         <CannotDeleteDepartmentWithEmployeeErrorView 
                         error={businessError as CannotDeleteDepartmentWithEmployeesError}/>
                     )
                     .when(
-                        businessError!.code === 'CANNOT_DELETE_EMPLOYEE_WITH_SUBORDINATES',
+                        businessError?.code === 'CANNOT_DELETE_EMPLOYEE_WITH_SUBORDINATES',
                         <CannotDeleteEmployeeWithSubordinatesErrorView 
                         error={businessError as CannotDeleteEmployeeWithSubordinatesError}/>
                     )
                     .when(
-                        businessError!.code === 'SUPERVISOR_CYCLE',
+                        businessError?.code === 'SUPERVISOR_CYCLE',
                         <SupvisorCycleErrorView 
                         error={businessError as SupervisorCycleError}/>
                     )
                     .otherwise(
-                        <div>Unknown business exception {businessError!.code}</div>
+                        <div>Unknown business exception {businessError?.code}</div>
                     )
                 )
                 .otherwise(
@@ -75,7 +87,7 @@ export const APIErrorView: React.FC<{
     );
 };
 
-const PREFIX = "BUSINESS:";
+export const BUSINESS_PREFIX = "BUSINESS:";
 
 const CannotDeleteDepartmentWithEmployeeErrorView: React.FC<{
     error: CannotDeleteDepartmentWithEmployeesError
