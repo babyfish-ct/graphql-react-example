@@ -2,20 +2,23 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { AppView } from './nav/AppView';
 import { BUSINESS_PREFIX } from './exception/APIErrorView'; 
 import { GraphQLClient, ClientContext, Result, APIError, Headers } from 'graphql-hooks';
-import { writeStorage, useLocalStorage } from '@rehooks/local-storage';
+import { writeStorage, deleteFromStorage, useLocalStorage } from '@rehooks/local-storage';
 import { LoginDialog } from './login/LoginDialog';
 
 function App() {
     
     const [token] = useLocalStorage("token");
-    const headers = useMemo<Headers>(() => {
-        if (token === undefined || token === null || token === "") {
-            return {};
-        }
-        return {
-            Authorization: token
-        } as Headers;
+    const online = useMemo<boolean>(() => {
+        return token !== undefined && token !== null && token !== "";
     }, [token]);
+    const headers = useMemo<Headers>(() => {
+        if (online) {
+            return {
+                Authorization: token
+            } as Headers;
+        }
+        return {};
+    }, [token, online]);
 
     const [loginDialog, setLoginDialog] = useState<boolean>(false);
 
@@ -45,6 +48,14 @@ function App() {
         setLoginDialog(false);
     }, []);
 
+    const onAuthorizationChanging = useCallback((online: boolean) => {
+        if (online) {
+            setLoginDialog(true);
+        } else {
+            deleteFromStorage("token");
+        }
+    }, []);
+
     const client = new GraphQLClient({
         url: 'http://localhost:8080/graphql',
         headers,
@@ -54,7 +65,7 @@ function App() {
     });
     return (
         <ClientContext.Provider value={client}>
-            <AppView/>
+            <AppView online={online} onAuthorizationChanging={onAuthorizationChanging}/>
             <LoginDialog 
             visible={loginDialog} 
             onClose={onLoginDialogClose}/>

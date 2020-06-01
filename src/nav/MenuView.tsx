@@ -4,7 +4,6 @@ import { useLocation } from 'wouter';
 import { DEPARTMENTS, EMPLOYEES } from './Constants';
 
 export const MenuView: React.FC = () => {
-
     const [path, goto] = useLocation();
 
     const selectedKey = path === "/" ? DEPARTMENTS : path;
