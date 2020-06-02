@@ -1,6 +1,6 @@
 # Get and start server side
 
-Please see https://github.com/babyfish-ct/graphql-kotlin-example to know more
+Please see https://github.com/babyfish-ct/graphql-kotlin-example or https://github.com/babyfish-ct/graphql-csharp-example to know more
 
 # Get and start client side
 

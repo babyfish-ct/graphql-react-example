@@ -16,12 +16,21 @@ export const APIErrorView: React.FC<{
 
             // Why does not GraphQLError declare the field 'errorType'?
             const errorType = (graphQLError as any)["errorType"] as string | undefined;
-
+            const extensions = (graphQLError as any)["extensions"] as any | undefined;
+            const extensionCode = extensions !== undefined ? extensions["code"] : undefined;
+            // For kotlin server "https://github.com/babyfish-ct/graphql-kotlin-example"
             if (errorType !== undefined && errorType.startsWith(BUSINESS_PREFIX)) {
                 return {
                     code: errorType.substring(BUSINESS_PREFIX.length),
-                    ...(graphQLError as any)["extensions"]
-                } as any as BusinessError;
+                    ...extensions
+                } as BusinessError;
+            }
+            // For C# server "https://github.com/babyfish-ct/graphql-csharp-example"
+            if (extensionCode !== undefined && extensionCode?.startsWith(BUSINESS_PREFIX)) {
+                return {
+                    ...extensions,
+                    code: extensionCode.substring(BUSINESS_PREFIX.length)
+                } as BusinessError;
             }
         }
         return undefined;

@@ -17,27 +17,27 @@ export const AppView: React.FC<{
 
     return (
         <Layout>
-                <Layout.Header style={{backgroundColor: 'white'}}>
-                    <div className="header" style={{display: 'flex'}}>
-                        <div style={{width: 496}}>GraphQL React Example</div>
-                        <div style={{flex: 1}}>
-                            <MenuView/>
-                        </div>
-                        <div>
-                            <Button onClick={onAuthorizationClick}>
-                                {
-                                    online ?
-                                    <LogoutOutlined/> :
-                                    <LoginOutlined/>
-                                }
-                                { online ? "Logout" : "Login" }
-                            </Button>
-                        </div>
+            <Layout.Header style={{backgroundColor: 'white'}}>
+                <div className="header" style={{display: 'flex'}}>
+                    <div style={{width: 496}}>GraphQL React Example</div>
+                    <div style={{flex: 1}}>
+                        <MenuView/>
                     </div>
-                </Layout.Header>
-                <Layout.Content>
-                    <ContentView/>
-                </Layout.Content>
-            </Layout>
+                    <div>
+                        <Button onClick={onAuthorizationClick}>
+                            {
+                                online ?
+                                <LogoutOutlined/> :
+                                <LoginOutlined/>
+                            }
+                            { online ? "Logout" : "Login" }
+                        </Button>
+                    </div>
+                </div>
+            </Layout.Header>
+            <Layout.Content>
+                <ContentView/>
+            </Layout.Content>
+        </Layout>
     );
 };
